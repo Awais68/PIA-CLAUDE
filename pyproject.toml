@@ -1,0 +1,17 @@
+[project]
+name = "zoya"
+version = "0.1.0"
+description = "Zoya - Personal AI Employee (Bronze Tier)"
+requires-python = ">=3.13"
+dependencies = [
+    "watchdog>=6.0.0",
+]
+
+[project.scripts]
+zoya-watcher = "src.watcher:main"
+zoya-orchestrator = "src.orchestrator:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]

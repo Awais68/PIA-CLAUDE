@@ -1,0 +1,33 @@
+# OS
+.DS_Store
+
+# Secrets
+.env
+credentials.json
+token.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+
+# Node
+node_modules/
+dist/
+coverage/
+
+# Vault runtime artifacts (tracked via .gitkeep, not contents)
+AI_Employee_Vault/Inbox/*
+AI_Employee_Vault/Needs_Action/*
+AI_Employee_Vault/In_Progress/*
+AI_Employee_Vault/Done/*
+AI_Employee_Vault/Quarantine/*
+AI_Employee_Vault/Logs/*
+!AI_Employee_Vault/*/.gitkeep
+
+# Lock files (runtime)
+*.lock.pid
+
+# uv
+uv.lock
