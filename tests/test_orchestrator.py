@@ -145,7 +145,7 @@ class TestRunCycle:
         assert run_cycle() == 0
 
     def test_processes_pending_file(self, vault, sample_md, sample_companion):
-        with patch("src.orchestrator.process_with_claude", return_value=True), \
+        with patch("src.orchestrator.process_file", return_value=True), \
              patch("src.orchestrator.update_dashboard"):
             count = run_cycle()
 
@@ -154,7 +154,7 @@ class TestRunCycle:
         assert len(done_mds) == 1
 
     def test_handles_claude_failure(self, vault, sample_md, sample_companion):
-        with patch("src.orchestrator.process_with_claude", return_value=False), \
+        with patch("src.orchestrator.process_file", return_value=False), \
              patch("src.orchestrator.update_dashboard"):
             count = run_cycle()
 
@@ -176,7 +176,7 @@ class TestRunCycle:
             comp = vault["NEEDS_ACTION"] / f"FILE_2026021{i}_120000_doc{i}.pdf"
             comp.write_bytes(b"content")
 
-        with patch("src.orchestrator.process_with_claude", return_value=True), \
+        with patch("src.orchestrator.process_file", return_value=True), \
              patch("src.orchestrator.update_dashboard"):
             count = run_cycle()
 
@@ -186,7 +186,7 @@ class TestRunCycle:
     def test_skips_non_pending(self, vault, sample_md, sample_companion):
         _update_frontmatter(sample_md, {"status": "in_progress"})
 
-        with patch("src.orchestrator.process_with_claude", return_value=True), \
+        with patch("src.orchestrator.process_file", return_value=True), \
              patch("src.orchestrator.update_dashboard"):
             count = run_cycle()
 

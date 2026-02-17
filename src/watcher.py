@@ -119,7 +119,7 @@ class InboxHandler(FileSystemEventHandler):
             return
         self._seen_hashes.add(content_hash)
 
-        # 6. Copy file + create metadata with timestamped name
+        # 6. Move file + create metadata with timestamped name
         ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
         safe_stem = self._sanitise_name(source.stem)
         dest_name = f"FILE_{ts}_{safe_stem}{source.suffix}"
@@ -128,14 +128,12 @@ class InboxHandler(FileSystemEventHandler):
         dest_path = NEEDS_ACTION / dest_name
         meta_path = NEEDS_ACTION / meta_name
 
-        shutil.copy2(source, dest_path)
+        # Move instead of copy+delete — atomic and avoids race conditions
+        shutil.move(str(source), dest_path)
         self._write_metadata(meta_path, source, dest_path, content_hash)
 
         logger.info("Queued for processing: %s -> %s", source.name, dest_name)
         log_action("file_queued", str(dest_path), {"original": source.name})
-
-        # 7. Remove from Inbox (it's now safely in Needs_Action)
-        source.unlink(missing_ok=True)
 
     # ---- helpers ---------------------------------------------------------
 

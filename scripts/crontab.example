@@ -1,0 +1,19 @@
+# =============================================================
+# Zoya Silver Tier — Cron Jobs (S7)
+# =============================================================
+# Install with: crontab scripts/crontab.example
+# Or copy entries into: crontab -e
+#
+# Adjust PROJECT_DIR to your installation path.
+# =============================================================
+
+PROJECT_DIR="/media/awais/6372445e-8fda-42fa-9034-61babd7dafd1/150 GB DATA TRANSFER/hackathon series/0 FTE Hackathon/PIA-CLAUDE"
+
+# Daily: Run orchestrator once at 8:00 AM (process any overnight files)
+0 8 * * * cd "$PROJECT_DIR" && uv run zoya-orchestrator --once >> /tmp/zoya-cron.log 2>&1
+
+# Weekly: LinkedIn post generation every Monday at 9:00 AM
+0 9 * * 1 cd "$PROJECT_DIR" && uv run zoya-linkedin >> /tmp/zoya-linkedin.log 2>&1
+
+# Daily: Dashboard refresh at 8:30 AM
+30 8 * * * cd "$PROJECT_DIR" && uv run zoya-orchestrator --once >> /tmp/zoya-cron.log 2>&1

@@ -12,27 +12,20 @@ SAFETY: send_email NEVER sends directly. It creates an approval file in
 
 Setup:
     1. Gmail API credentials must be set up first (see gmail_watcher.py)
-    2. Install MCP SDK: uv add mcp
-    3. Configure in .claude/mcp.json
-    4. Verify: claude mcp list
-
-Dependencies:
-    uv add mcp google-api-python-client google-auth-oauthlib google-auth-httplib2
+    2. Configure in .claude/mcp.json
+    3. Verify: claude mcp list
 """
 
+from __future__ import annotations
+
 import json
-import base64
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
-from email.mime.text import MIMEText
 
-# TODO: Uncomment after installing mcp SDK
-# from mcp.server import Server
-# from mcp.types import Tool, TextContent
+from mcp.server.fastmcp import FastMCP
 
-# TODO: Uncomment after installing google-auth
-# from google.oauth2.credentials import Credentials
-# from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
+from googleapiclient.discovery import build
 
 # Paths — relative to project root
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -45,27 +38,21 @@ SCOPES = [
     "https://www.googleapis.com/auth/gmail.send",
 ]
 
-# TODO: Uncomment after installing mcp SDK
-# app = Server("email-mcp")
+mcp = FastMCP("zoya-email")
 
 
 def _get_gmail_service():
-    """Build authenticated Gmail service.
-
-    Raises:
-        RuntimeError: If Gmail is not authenticated (no token.json).
-    """
-    # TODO: Implement after installing dependencies
-    # if not GMAIL_TOKEN.exists():
-    #     raise RuntimeError("Gmail not authenticated. Run gmail_watcher first.")
-    # creds = Credentials.from_authorized_user_file(str(GMAIL_TOKEN), SCOPES)
-    # return build("gmail", "v1", credentials=creds)
-    raise NotImplementedError("Install google-api-python-client first")
+    """Build authenticated Gmail service."""
+    if not GMAIL_TOKEN.exists():
+        raise RuntimeError(
+            "Gmail not authenticated. Run: uv run python scripts/setup_gmail_auth.py"
+        )
+    creds = Credentials.from_authorized_user_file(str(GMAIL_TOKEN), SCOPES)
+    return build("gmail", "v1", credentials=creds)
 
 
-# TODO: Uncomment and use proper MCP SDK decorator
-# @app.tool()
-async def send_email(to: str, subject: str, body: str) -> str:
+@mcp.tool()
+def send_email(to: str, subject: str, body: str) -> str:
     """Draft an email and route it through HITL approval.
 
     Does NOT send immediately. Creates an approval request file
@@ -81,45 +68,39 @@ async def send_email(to: str, subject: str, body: str) -> str:
     """
     PENDING_APPROVAL.mkdir(parents=True, exist_ok=True)
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    safe_subject = "".join(c if c.isalnum() or c in "_-" else "_" for c in subject)[
-        :40
-    ]
+    now = datetime.now(timezone.utc)
+    timestamp = now.strftime("%Y%m%d_%H%M%S")
+    safe_subject = "".join(c if c.isalnum() or c in "_-" else "_" for c in subject)[:40]
 
     approval_file = PENDING_APPROVAL / f"SEND_EMAIL_{timestamp}_{safe_subject}.md"
-    approval_file.write_text(f"""---
-type: email_send
-action: send_email
-status: pending_approval
-to: {to}
-subject: {subject}
-created: {datetime.now().isoformat()}
-source: mcp_email_server
-approval_required: true
-approval_reason: Outbound email requires human approval
----
-
-## Email Draft
-
-**To:** {to}
-**Subject:** {subject}
-
-{body}
-
----
-
-## To Approve
-Move this file to /Approved/ in Obsidian.
-
-## To Reject
-Move this file to /Rejected/ in Obsidian.
-""")
+    approval_file.write_text(
+        f"---\n"
+        f"type: email_send\n"
+        f"action: send_email\n"
+        f"status: pending_approval\n"
+        f"to: {to}\n"
+        f"subject: {subject}\n"
+        f"created: {now.isoformat()}\n"
+        f"source: mcp_email_server\n"
+        f"approval_required: true\n"
+        f"approval_reason: Outbound email requires human approval\n"
+        f"---\n\n"
+        f"## Email Draft\n\n"
+        f"**To:** {to}\n"
+        f"**Subject:** {subject}\n\n"
+        f"{body}\n\n"
+        f"---\n\n"
+        f"## To Approve\n"
+        f"Move this file to /Approved/ in Obsidian.\n\n"
+        f"## To Reject\n"
+        f"Move this file to /Rejected/ in Obsidian.\n",
+        encoding="utf-8",
+    )
     return f"Email draft created and routed for approval: {approval_file.name}"
 
 
-# TODO: Uncomment and use proper MCP SDK decorator
-# @app.tool()
-async def search_emails(query: str, max_results: int = 5) -> str:
+@mcp.tool()
+def search_emails(query: str, max_results: int = 5) -> str:
     """Search Gmail inbox and return matching emails.
 
     Args:
@@ -167,9 +148,8 @@ async def search_emails(query: str, max_results: int = 5) -> str:
     return "\n".join(output_lines)
 
 
-# TODO: Uncomment and use proper MCP SDK decorator
-# @app.tool()
-async def list_recent_emails(count: int = 10) -> str:
+@mcp.tool()
+def list_recent_emails(count: int = 10) -> str:
     """List the N most recent emails in the inbox.
 
     Args:
@@ -178,15 +158,12 @@ async def list_recent_emails(count: int = 10) -> str:
     Returns:
         Formatted markdown list of recent emails.
     """
-    return await search_emails(query="in:inbox", max_results=count)
+    return search_emails(query="in:inbox", max_results=count)
 
 
 def main():
-    """Run the MCP server."""
-    # TODO: Uncomment after installing mcp SDK
-    # import asyncio
-    # asyncio.run(app.run())
-    raise NotImplementedError("Install mcp SDK first: uv add mcp")
+    """Run the MCP server via stdio transport."""
+    mcp.run()
 
 
 if __name__ == "__main__":

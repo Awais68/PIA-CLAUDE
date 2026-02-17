@@ -24,6 +24,11 @@ def vault(tmp_path: Path, monkeypatch):
         "DONE": tmp_path / "vault" / "Done",
         "QUARANTINE": tmp_path / "vault" / "Quarantine",
         "LOGS": tmp_path / "vault" / "Logs",
+        "PLANS": tmp_path / "vault" / "Plans",
+        "PENDING_APPROVAL": tmp_path / "vault" / "Pending_Approval",
+        "APPROVED": tmp_path / "vault" / "Approved",
+        "REJECTED": tmp_path / "vault" / "Rejected",
+        "BRIEFINGS": tmp_path / "vault" / "Briefings",
     }
     for attr, path in dirs.items():
         path.mkdir(parents=True, exist_ok=True)
