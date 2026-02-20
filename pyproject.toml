@@ -1,7 +1,7 @@
 [project]
 name = "zoya"
-version = "0.1.0"
-description = "Zoya - Personal AI Employee (Silver Tier)"
+version = "0.2.0"
+description = "Zoya - Personal AI Employee (Gold Tier)"
 requires-python = ">=3.13"
 dependencies = [
     "watchdog>=6.0.0",
@@ -12,14 +12,27 @@ dependencies = [
     "google-auth-httplib2>=0.2.0",
     "mcp>=1.26.0",
     "requests>=2.31.0",
+    "flask>=3.0.0",
+    "tweepy>=4.14.0",
 ]
 
 [project.scripts]
 zoya-watcher = "src.watcher:main"
 zoya-orchestrator = "src.orchestrator:main"
 zoya-gmail = "src.watchers.gmail_watcher:main"
+zoya-whatsapp = "src.watchers.whatsapp_watcher:main"
 zoya-linkedin = "src.linkedin_poster:main"
 zoya-email-mcp = "src.mcp.email_server:main"
+zoya-briefing = "src.briefing_generator:main"
+zoya-twitter = "src.twitter_poster:main"
+zoya-twitter-mcp = "src.mcp_servers.twitter_mcp:main"
+zoya-odoo-mcp = "src.mcp_servers.odoo_mcp:main"
+zoya-cross-domain = "src.cross_domain_orchestrator:main"
+zoya-audit = "src.audit_generator:main"
+zoya-ralph = "src.ralph_wiggum:main"
+zoya-bank = "src.watchers.bank_watcher:main"
+zoya-smart-reply = "src.automations.smart_reply:main"
+zoya-log-janitor = "src.log_janitor:main"
 
 [build-system]
 requires = ["hatchling"]

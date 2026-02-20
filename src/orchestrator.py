@@ -29,6 +29,7 @@ from pathlib import Path
 from src.config import (
     AI_PROVIDER,
     APPROVED,
+    BRIEFINGS,
     DASHBOARD,
     DASHSCOPE_API_KEY,
     DONE,
@@ -49,6 +50,7 @@ from src.config import (
     REJECTED,
     VAULT_PATH,
 )
+from src.source_normalizer import get_source_priority
 from src.utils import acquire_lock, log_action, release_lock, setup_logger
 
 logger = setup_logger("orchestrator")
@@ -254,8 +256,13 @@ def _write_qwen_result(meta_path: Path, fm: dict[str, str], ai_output: str) -> N
     # Remove the AI's frontmatter block from output (keep the rest)
     body = _re.sub(r"^---.*?---\s*", "", ai_output, flags=_re.DOTALL).strip()
 
-    # Build the final metadata file
+    # Build the final metadata file — preserve source channel fields
     now = datetime.now(timezone.utc).isoformat()
+    extra = ""
+    for key in ("source", "from", "to", "subject", "gmail_id", "received",
+                "message_type", "approval_required"):
+        if fm.get(key):
+            extra += f"{key}: {fm[key]}\n"
     content = (
         f"---\n"
         f"type: {doc_type}\n"
@@ -269,6 +276,7 @@ def _write_qwen_result(meta_path: Path, fm: dict[str, str], ai_output: str) -> N
         f"priority: {priority}\n"
         f"processed_at: {now}\n"
         f"ai_provider: qwen/{QWEN_MODEL}\n"
+        f"{extra}"
         f"---\n\n"
         f"{body}\n"
     )
@@ -346,6 +354,11 @@ def _write_ollama_result(meta_path: Path, fm: dict[str, str], ai_output: str) ->
     body = re.sub(r"^---.*?---\s*", "", ai_output, flags=re.DOTALL).strip()
 
     now = datetime.now(timezone.utc).isoformat()
+    extra = ""
+    for key in ("source", "from", "to", "subject", "gmail_id", "received",
+                "message_type", "approval_required"):
+        if fm.get(key):
+            extra += f"{key}: {fm[key]}\n"
     content = (
         f"---\n"
         f"type: {doc_type}\n"
@@ -359,6 +372,7 @@ def _write_ollama_result(meta_path: Path, fm: dict[str, str], ai_output: str) ->
         f"priority: {priority}\n"
         f"processed_at: {now}\n"
         f"ai_provider: ollama/{OLLAMA_MODEL}\n"
+        f"{extra}"
         f"---\n\n"
         f"{body}\n"
     )
@@ -417,18 +431,24 @@ def process_file(meta_path: Path, companion: Path | None) -> bool:
     return _process_with_claude(meta_path, companion)
 
 
-def move_to_done(meta_path: Path, companion: Path | None) -> None:
-    """Move processed files from In_Progress to Done."""
+def move_to_done(meta_path: Path, companion: Path | None) -> tuple[Path, Path | None]:
+    """Move processed files from In_Progress to Done.
+
+    Returns (dest_meta, dest_companion) paths.
+    """
     dest_meta = DONE / meta_path.name
     shutil.move(str(meta_path), dest_meta)
+    dest_companion = None
     if companion and companion.exists():
-        shutil.move(str(companion), DONE / companion.name)
+        dest_companion = DONE / companion.name
+        shutil.move(str(companion), dest_companion)
     _update_frontmatter(dest_meta, {
         "status": "done",
         "processed_at": datetime.now(timezone.utc).isoformat(),
     })
     log_action("file_done", str(dest_meta))
     logger.info("Moved to Done: %s", dest_meta.name)
+    return dest_meta, dest_companion
 
 
 def handle_failure(meta_path: Path, companion: Path | None) -> None:
@@ -528,6 +548,7 @@ def _update_dashboard_local() -> None:
         fm = _read_frontmatter(f)
         recent_items.append(
             f"| {fm.get('original_name', f.name)} | {fm.get('type', '?')} | "
+            f"{fm.get('source', 'file_drop')} | "
             f"{fm.get('priority', '?')} | {fm.get('processed_at', '?')[:19]} |"
         )
 
@@ -539,11 +560,45 @@ def _update_dashboard_local() -> None:
     if q_files:
         alerts = f"\n> **Alerts:** {len(q_files)} item(s) in Quarantine need review.\n"
 
+    # Silver tier folder counts
+    silver_counts = {
+        "Plans": _count(PLANS),
+        "Pending_Approval": _count(PENDING_APPROVAL),
+        "Approved": _count(APPROVED),
+        "Rejected": _count(REJECTED),
+    }
+
+    # Gold tier folder counts
+    from src.config import BRIEFINGS as _BRIEFINGS
+    CONTACTS = VAULT_PATH / "Contacts"
+    gold_counts = {
+        "Briefings": _count(_BRIEFINGS),
+        "Contacts": _count(CONTACTS),
+    }
+
+    # Count by source in Done
+    source_counts = {"file_drop": 0, "gmail": 0, "whatsapp": 0}
+    for f in DONE.glob("*.md"):
+        fm = _read_frontmatter(f)
+        src = fm.get("source", "file_drop")
+        if src in source_counts:
+            source_counts[src] += 1
+
+    # Gold G2: system health from Ralph
+    try:
+        from src.ralph_loop import get_system_status
+        sys_status = get_system_status()
+        health_score = max(0, 100 - (sys_status["issues"] * 10))
+        health_line = f"**System Health:** {health_score}/100 ({sys_status['status'].upper()})\n\n"
+    except Exception:
+        health_line = ""
+
     dashboard = (
         f"---\nlast_updated: {now.isoformat()}\nai_provider: {provider_tag}\n---\n\n"
         f"# Zoya Dashboard\n\n"
         f"**Last updated:** {now.strftime('%Y-%m-%d %H:%M:%S UTC')}\n"
-        f"**AI Provider:** {provider_label}\n\n"
+        f"**AI Provider:** {provider_label}\n"
+        f"{health_line}"
         f"## Queue Status\n\n"
         f"| Folder | Count |\n|--------|-------|\n"
         f"| Inbox | {counts['Inbox']} |\n"
@@ -551,10 +606,19 @@ def _update_dashboard_local() -> None:
         f"| In Progress | {counts['In_Progress']} |\n"
         f"| Done | {counts['Done']} |\n"
         f"| Quarantine | {counts['Quarantine']} |\n"
+        f"| Pending Approval | {silver_counts['Pending_Approval']} |\n"
+        f"| Plans | {silver_counts['Plans']} |\n"
+        f"| Briefings | {gold_counts['Briefings']} |\n"
+        f"| Contacts | {gold_counts['Contacts']} |\n"
         f"{alerts}\n"
+        f"## Watcher Stats\n\n"
+        f"| Source | Processed |\n|--------|----------|\n"
+        f"| File Drop | {source_counts['file_drop']} |\n"
+        f"| Gmail | {source_counts['gmail']} |\n"
+        f"| WhatsApp | {source_counts['whatsapp']} |\n\n"
         f"## Recent Activity\n\n"
-        f"| File | Type | Priority | Processed |\n"
-        f"|------|------|----------|-----------|\n"
+        f"| File | Type | Source | Priority | Processed |\n"
+        f"|------|------|--------|----------|-----------|\n"
         f"{recent_table}\n"
     )
     DASHBOARD.write_text(dashboard, encoding="utf-8")
@@ -788,14 +852,18 @@ def run_cycle() -> int:
         key=lambda p: p.stat().st_mtime,
     )
 
-    # Filter to only status: pending
+    # Filter to only status: pending, then sort by source priority
     actionable = []
     for p in pending:
         fm = _read_frontmatter(p)
         if fm.get("status") == "pending":
-            actionable.append(p)
+            actionable.append((p, fm))
         if len(actionable) >= MAX_BATCH_SIZE:
             break
+
+    # Sort: WhatsApp > Gmail > file_drop (higher priority first)
+    actionable.sort(key=lambda x: -get_source_priority(x[1].get("source", "file_drop")))
+    actionable = [p for p, _ in actionable]
 
     if not actionable:
         return 0
@@ -821,7 +889,22 @@ def run_cycle() -> int:
                 route_to_approval(in_prog_meta, in_prog_companion)
                 logger.info("File requires approval: %s", in_prog_meta.name)
             else:
-                move_to_done(in_prog_meta, in_prog_companion)
+                dest_meta, _ = move_to_done(in_prog_meta, in_prog_companion)
+                # Gold G3: update contact graph for completed items
+                try:
+                    from src.cross_domain_linker import process_item_for_contacts
+                    process_item_for_contacts(dest_meta)
+                except Exception:
+                    logger.debug("Contact linking skipped (non-critical)")
+
+                # Gold: Smart Reply — draft reply for high-priority/VIP gmail emails
+                try:
+                    from src.automations.smart_reply import process_email_for_smart_reply
+                    reply_path = process_email_for_smart_reply(dest_meta)
+                    if reply_path:
+                        logger.info("Smart reply draft created: %s", reply_path.name)
+                except Exception:
+                    logger.debug("Smart reply skipped (non-critical)")
             processed += 1
         else:
             handle_failure(in_prog_meta, in_prog_companion)
@@ -830,6 +913,38 @@ def run_cycle() -> int:
     approved_count = process_approved_files()
     rejected_count = process_rejected_files()
     processed += approved_count
+
+    # Gold: send approved email reply drafts
+    try:
+        from src.automations.smart_reply import process_approved_replies
+        reply_count = process_approved_replies()
+        if reply_count:
+            logger.info("Sent %d approved email reply/replies", reply_count)
+    except Exception:
+        logger.debug("Approved reply processing skipped (non-critical)")
+
+    # Gold G2: Ralph Wiggum self-monitoring checks (run every cycle)
+    try:
+        from src.ralph_loop import run_ralph_checks
+        run_ralph_checks()
+    except Exception:
+        logger.debug("Ralph checks skipped (non-critical)")
+
+    # Gold G9: Ralph Wiggum autonomous loop — rescue stuck In_Progress tasks
+    try:
+        from src.ralph_wiggum import check_and_trigger_for_stuck
+        rescued = check_and_trigger_for_stuck(stuck_threshold_minutes=20)
+        if rescued:
+            logger.info("Ralph Wiggum rescued %d stuck task(s)", rescued)
+    except Exception:
+        logger.debug("Ralph Wiggum stuck-task check skipped (non-critical)")
+
+    # Gold G5: Cross-domain integration (WhatsApp → business tasks, bank → client ledger)
+    try:
+        from src.cross_domain_orchestrator import run_cross_domain_cycle
+        run_cross_domain_cycle()
+    except Exception:
+        logger.debug("Cross-domain cycle skipped (non-critical)")
 
     # Update dashboard after processing
     if processed > 0 or approved_count > 0 or rejected_count > 0:

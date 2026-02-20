@@ -1,0 +1,20 @@
+{
+  "_comment": "VIP and known trusted senders. Used by email_triage skill to assign sender_trust level.",
+  "_format": "Each entry needs at minimum an 'email' or 'domain' field. 'tier' is 'vip' or 'known'.",
+  "contacts": [
+    {
+      "name": "Example VIP Client",
+      "email": "vip@example.com",
+      "domain": null,
+      "tier": "vip",
+      "notes": "Top client — always URGENT priority"
+    },
+    {
+      "name": "Example Known Contact",
+      "email": null,
+      "domain": "trustedbusiness.com",
+      "tier": "known",
+      "notes": "All emails from this domain are from known contacts"
+    }
+  ]
+}

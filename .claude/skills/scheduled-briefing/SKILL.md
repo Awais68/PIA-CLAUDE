@@ -1,66 +1,86 @@
 # Scheduled Briefing Skill
 
 ## Purpose
-Generate periodic briefing documents summarizing recent activity, pending
-tasks, and upcoming deadlines. Supports daily and weekly schedules.
+Generate periodic CEO briefing documents summarizing activity, pending tasks,
+upcoming deadlines, and system health across all channels (file drop, Gmail, WhatsApp).
 
 ## When This Skill Is Used
-Triggered by cron schedule or manual request. Generates a briefing
-document in AI_Employee_Vault/Briefings/.
+- Triggered daily by cron via `uv run zoya-briefing`
+- Triggered weekly via `uv run zoya-briefing --weekly`
+- Can be invoked manually at any time
+- Also called from the scheduler (`JobScheduler`) for automated generation
+
+## Entry Point
+```
+uv run zoya-briefing [--weekly]
+```
 
 ## Input
-- Files in Done/ (recent activity)
-- Files in Needs_Action/ (pending work)
-- Files in Quarantine/ (items needing attention)
-- Files in Pending_Approval/ (awaiting human review)
-- Dashboard.md for current stats
+- `AI_Employee_Vault/Done/` — completed items with processed_at timestamps
+- `AI_Employee_Vault/Needs_Action/` — pending items
+- `AI_Employee_Vault/In_Progress/` — items currently being processed
+- `AI_Employee_Vault/Quarantine/` — failed items needing attention
+- `AI_Employee_Vault/Pending_Approval/` — items awaiting human review
+- `AI_Employee_Vault/Plans/` — active plan documents
 
 ## Processing Steps
-1. Scan all vault folders for current state
-2. Collect items processed in the briefing period (daily: last 24h, weekly: last 7d)
-3. Identify pending items requiring attention
-4. Summarize quarantined items needing review
-5. List upcoming deadlines from action items
-6. Generate the briefing document
+1. Determine period: daily (last 24h) or weekly (last 7 days)
+2. Scan Done/ for items processed within the period
+3. Compute channel breakdown (file_drop / gmail / whatsapp)
+4. Compute document type breakdown
+5. Collect pending, approval, and quarantine items
+6. Extract action items with deadlines from recent Done/ files
+7. Compute system health score (0-100, penalized by quarantine/stuck/backlog)
+8. Generate the briefing document
+9. Save to `AI_Employee_Vault/Briefings/BRIEFING_YYYYMMDD_HHMMSS_<period>.md`
 
 ## Output Format
-Create a briefing file in Briefings/:
 ```markdown
 ---
 type: briefing
 period: <daily|weekly>
 generated_at: <ISO timestamp>
-covers_from: <start ISO timestamp>
-covers_to: <end ISO timestamp>
+covers_from: <ISO timestamp>
+covers_to: <ISO timestamp>
+health_score: <0-100>
 ---
 
-# <Daily|Weekly> Briefing — <date>
+# <Daily|Weekly> Briefing — YYYY-MM-DD
+
+**Generated:** ...
+**System Health:** <score>/100
 
 ## Summary
-- **Processed:** <count> items
-- **Pending:** <count> items
-- **Quarantined:** <count> items needing review
-- **Awaiting Approval:** <count> items
+| Metric | Count |
+
+## Channel Breakdown
+| Channel | Processed |
+
+## Document Types
+| Type | Count |
 
 ## Completed Items
-| File | Type | Priority | Processed |
-|------|------|----------|-----------|
-| ... | ... | ... | ... |
+| File | Type | Channel | Priority | Approval | Processed |
 
 ## Pending Items
-| File | Type | Priority | Queued |
-|------|------|----------|-------|
-| ... | ... | ... | ... |
+...
 
-## Attention Required
-- <quarantined items or overdue actions>
+## Awaiting Human Approval
+...
 
-## Upcoming Deadlines
-- <extracted deadlines from action items>
+## ⚠️ Attention Required (if quarantine items exist)
+...
+
+## Upcoming Deadlines (if found)
+...
+
+## Weekly Trends (weekly only)
+...
 ```
 
 ## Special Rules
-- Briefings are informational only — no actions taken
-- Include counts even if zero for consistency
-- Weekly briefings should include trend data if available
-- Store briefings for 30 days, then archive
+- Briefings are read-only — no actions taken, no files moved
+- System health score: 100 = perfect, -10 per quarantined item, -5 per stuck/pending
+- Weekly briefings include 7-day trend data
+- Briefings stored for 30 days, then archived
+- Empty sections still shown for consistency (shows zero counts)

@@ -4,6 +4,31 @@
       "command": "uv",
       "args": ["run", "python", "-m", "src.mcp.email_server"],
       "env": {}
+    },
+    "zoya-twitter": {
+      "command": "uv",
+      "args": ["run", "python", "-m", "src.mcp_servers.twitter_mcp"],
+      "env": {}
+    },
+    "zoya-whatsapp": {
+      "command": "uv",
+      "args": ["run", "python", "-m", "src.mcp_servers.whatsapp_mcp"],
+      "env": {}
+    },
+    "zoya-odoo": {
+      "command": "uv",
+      "args": ["run", "zoya-odoo-mcp"],
+      "env": {}
+    },
+    "zoya-meta": {
+      "command": "uv",
+      "args": ["run", "python", "-m", "src.mcp_servers.meta_mcp"],
+      "env": {}
+    },
+    "zoya-calendar": {
+      "command": "uv",
+      "args": ["run", "python", "-m", "src.mcp_servers.calendar_mcp"],
+      "env": {}
     }
   }
 }

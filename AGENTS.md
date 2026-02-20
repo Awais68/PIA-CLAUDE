@@ -4,7 +4,7 @@
 
 Zoya is a Personal AI Employee built on Claude Code + Obsidian. She manages both personal and freelance/consulting business operations autonomously using a local-first, file-driven architecture.
 
-**Tier:** Bronze (Foundation)
+**Tier:** Gold
 **Architecture:** Perception -> Orchestration -> Reasoning -> Action (file-based)
 
 ---
@@ -342,9 +342,62 @@ Every action is logged in two formats:
 
 ---
 
+## Gold Tier — Active Features
+
+### G1: CEO Briefing Generator (`src/briefing_generator.py`)
+- Daily/weekly briefing documents in `AI_Employee_Vault/Briefings/`
+- Aggregates Done/, Pending/, Quarantine/ data across all channels
+- Channel breakdown (file_drop / gmail / whatsapp)
+- System health score (0-100)
+- Entry point: `uv run zoya-briefing [--weekly]`
+
+### G2: Ralph Wiggum Loop (`src/ralph_loop.py`)
+- Self-monitoring: detects stuck In_Progress, high quarantine, stale pending
+- Creates `RALPH_*.md` alert files in `Pending_Approval/` for human review
+- Runs every orchestrator cycle (transparent, non-blocking)
+- `get_system_status()` returns health dict for dashboard
+
+### G3: Cross-Domain Contact Linker (`src/cross_domain_linker.py`)
+- Links Gmail senders + WhatsApp contacts into `AI_Employee_Vault/Contacts/`
+- `CONTACT_<key>.md` per unique identity (email / phone)
+- Records full interaction history across channels
+- Called automatically after each item is processed
+
+### G4: Gold Dashboard
+- System health score line
+- Briefings + Contacts folder counts
+- Full channel breakdown (file_drop / gmail / whatsapp)
+
+### G5: Cross-Domain Orchestrator (`src/cross_domain_orchestrator.py`)
+- Bridges personal and business domains automatically
+- **Bridge 1:** WhatsApp messages containing business keywords (invoice, payment, project, client, etc.)
+  → auto-creates `TASK_*.md` in `Business/Tasks/`
+- **Bridge 2:** Bank transaction items in Done/ with payee matching a client
+  → appends ledger row to matching `Clients/CLIENT_*.md`
+- Deduplication via `Logs/.cross_domain_processed.json` (no double-processing)
+- Entry point: `uv run zoya-cross-domain`
+- Skill: `.claude/skills/cross-domain-integration/SKILL.md`
+
+### G6: Odoo Community MCP Server (`src/mcp_servers/odoo_mcp.py`)
+- Exposes Odoo ERP as MCP tools for Claude Code
+- Uses Odoo XML-RPC API (Python stdlib `xmlrpc.client` — no extra deps)
+- **Read tools (safe):** `odoo_test_connection`, `odoo_list_customers`,
+  `odoo_list_invoices`, `odoo_list_projects`, `odoo_list_tasks`, `odoo_get_record`
+- **Write tools (HITL):** `odoo_create_invoice`, `odoo_create_task`, `odoo_send_invoice`
+  → all write ops route through `Pending_Approval/` before executing
+- Config: `ODOO_URL`, `ODOO_DB`, `ODOO_USERNAME`, `ODOO_PASSWORD` in `.env`
+- Entry point: `uv run zoya-odoo-mcp`
+
+## Vault Folder Structure (Gold)
+```
+AI_Employee_Vault/
+├── Briefings/         # CEO briefing documents (daily/weekly)
+├── Contacts/          # Cross-channel contact records
+├── Business/
+│   └── Tasks/         # Auto-created tasks from WhatsApp business triggers
+└── Clients/           # Client records with linked transaction ledgers
+```
+
 ## Future Tiers
 
-This Bronze foundation enables upgrading to:
-- **Silver:** Add Gmail Watcher + WhatsApp Watcher + MCP servers + HITL approval workflow
-- **Gold:** Full cross-domain integration + CEO Briefing + Ralph Wiggum loop
 - **Platinum:** Cloud deployment + always-on operation

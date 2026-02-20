@@ -1,0 +1,12 @@
+{
+  "_comment": "Known spam/unwanted senders. Used by email_triage skill to assign sender_trust: SPAM.",
+  "_format": "Each entry needs at minimum an 'email' or 'domain' field.",
+  "contacts": [
+    {
+      "email": null,
+      "domain": "spam-example.com",
+      "reason": "Known bulk marketing domain",
+      "added_at": "2026-02-18"
+    }
+  ]
+}

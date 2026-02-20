@@ -1,10 +1,18 @@
 # OS
 .DS_Store
 
-# Secrets
+# Secrets — NEVER commit any of these
 .env
+.env.*
 credentials.json
 token.json
+*_token.json
+*_credentials.json
+client_secret*.json
+oauth_token*
+twitter_token*
+linkedin_token*
+whatsapp_token*
 
 # Python
 __pycache__/

@@ -1,0 +1,85 @@
+{
+  "servers": {
+    "filesystem": {
+      "type": "built-in",
+      "description": "Local filesystem read/write access for the Obsidian vault"
+    },
+    "email": {
+      "command": "python3",
+      "args": ["src/mcp/email_server.py"],
+      "description": "Gmail MCP — send_email (HITL), search_emails, list_recent_emails",
+      "env": {
+        "GOOGLE_CLIENT_ID": "${GOOGLE_CLIENT_ID}",
+        "GOOGLE_CLIENT_SECRET": "${GOOGLE_CLIENT_SECRET}",
+        "GOOGLE_REFRESH_TOKEN": "${GOOGLE_REFRESH_TOKEN}"
+      }
+    },
+    "browser": {
+      "command": "npx",
+      "args": ["@anthropic/browser-mcp"],
+      "description": "Headless browser for web scraping and research tasks"
+    },
+    "calendar": {
+      "command": "python3",
+      "args": ["src/mcp_servers/calendar_mcp.py"],
+      "description": "Google Calendar MCP — list events, create events, find free slots",
+      "env": {
+        "GOOGLE_CLIENT_ID": "${GOOGLE_CLIENT_ID}",
+        "GOOGLE_CLIENT_SECRET": "${GOOGLE_CLIENT_SECRET}",
+        "GOOGLE_REFRESH_TOKEN": "${GOOGLE_REFRESH_TOKEN}"
+      }
+    },
+    "odoo": {
+      "command": "python3",
+      "args": ["src/mcp_servers/odoo_mcp.py"],
+      "description": "Odoo ERP MCP — invoices, CRM leads, accounting entries",
+      "env": {
+        "ODOO_URL": "${ODOO_URL}",
+        "ODOO_DB": "${ODOO_DB}",
+        "ODOO_USERNAME": "${ODOO_USERNAME}",
+        "ODOO_API_KEY": "${ODOO_API_KEY}"
+      }
+    },
+    "meta_social": {
+      "command": "python3",
+      "args": ["src/mcp_servers/meta_mcp.py"],
+      "description": "Meta (Facebook/Instagram) MCP — post content, read insights",
+      "env": {
+        "META_ACCESS_TOKEN": "${META_ACCESS_TOKEN}",
+        "META_PAGE_ID": "${META_PAGE_ID}",
+        "META_INSTAGRAM_ID": "${META_INSTAGRAM_ID}"
+      }
+    },
+    "twitter": {
+      "command": "python3",
+      "args": ["src/mcp_servers/twitter_mcp.py"],
+      "description": "Twitter/X MCP — search tweets, get mentions, post (HITL)",
+      "env": {
+        "TWITTER_API_KEY": "${TWITTER_API_KEY}",
+        "TWITTER_API_SECRET": "${TWITTER_API_SECRET}",
+        "TWITTER_ACCESS_TOKEN": "${TWITTER_ACCESS_TOKEN}",
+        "TWITTER_ACCESS_TOKEN_SECRET": "${TWITTER_ACCESS_TOKEN_SECRET}",
+        "TWITTER_BEARER_TOKEN": "${TWITTER_BEARER_TOKEN}"
+      }
+    },
+    "whatsapp": {
+      "command": "python3",
+      "args": ["src/mcp_servers/whatsapp_mcp.py"],
+      "description": "WhatsApp Business MCP — send messages (HITL), read conversation history",
+      "env": {
+        "WHATSAPP_ACCESS_TOKEN": "${WHATSAPP_ACCESS_TOKEN}",
+        "WHATSAPP_PHONE_NUMBER_ID": "${WHATSAPP_PHONE_NUMBER_ID}"
+      }
+    }
+  },
+  "_notes": {
+    "env_vars": "All ${VAR} references are loaded from .env at runtime — never hardcode secrets.",
+    "email": "Uses existing src/mcp/email_server.py (FastMCP, full implementation).",
+    "browser": "Requires: npm install -g @anthropic/browser-mcp",
+    "calendar": "Stub — see TODO in src/mcp_servers/calendar_mcp.py",
+    "odoo": "Stub — see TODO in src/mcp_servers/odoo_mcp.py",
+    "meta_social": "Stub — see TODO in src/mcp_servers/meta_mcp.py",
+    "twitter": "Stub — see TODO in src/mcp_servers/twitter_mcp.py",
+    "whatsapp": "Stub — see TODO in src/mcp_servers/whatsapp_mcp.py"
+  }
+}

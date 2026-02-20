@@ -47,7 +47,13 @@ uv run zoya-gmail &
 PIDS+=($!)
 echo "[Zoya] Gmail Watcher started (PID ${PIDS[-1]})"
 
-# 3. Orchestrator
+# 3. WhatsApp Watcher
+echo "[Zoya] Starting WhatsApp Watcher..."
+uv run zoya-whatsapp &
+PIDS+=($!)
+echo "[Zoya] WhatsApp Watcher started (PID ${PIDS[-1]})"
+
+# 4. Orchestrator
 echo "[Zoya] Starting Orchestrator..."
 uv run zoya-orchestrator &
 PIDS+=($!)
@@ -58,9 +64,10 @@ echo "============================================"
 echo "  All services running. Press Ctrl+C to stop."
 echo "============================================"
 echo ""
-echo "  File Watcher:    PID ${PIDS[0]}"
-echo "  Gmail Watcher:   PID ${PIDS[1]}"
-echo "  Orchestrator:    PID ${PIDS[2]}"
+echo "  File Watcher:      PID ${PIDS[0]}"
+echo "  Gmail Watcher:     PID ${PIDS[1]}"
+echo "  WhatsApp Watcher:  PID ${PIDS[2]}"
+echo "  Orchestrator:      PID ${PIDS[3]}"
 echo ""
 
 # Wait for all background processes

@@ -15,6 +15,9 @@ def vault(tmp_path: Path, monkeypatch):
     import src.utils as utils_mod
     import src.watcher as watcher_mod
     import src.orchestrator as orch_mod
+    import src.briefing_generator as briefing_mod
+    import src.ralph_loop as ralph_mod
+    import src.cross_domain_linker as linker_mod
 
     dirs = {
         "VAULT_PATH": tmp_path / "vault",
@@ -29,6 +32,8 @@ def vault(tmp_path: Path, monkeypatch):
         "APPROVED": tmp_path / "vault" / "Approved",
         "REJECTED": tmp_path / "vault" / "Rejected",
         "BRIEFINGS": tmp_path / "vault" / "Briefings",
+        # Gold tier
+        "CONTACTS": tmp_path / "vault" / "Contacts",
     }
     for attr, path in dirs.items():
         path.mkdir(parents=True, exist_ok=True)
@@ -43,16 +48,14 @@ def vault(tmp_path: Path, monkeypatch):
 
     # Patch the already-imported names in consuming modules so they see
     # the tmp_path versions instead of the real vault.
+    all_mods = (utils_mod, watcher_mod, orch_mod, briefing_mod, ralph_mod, linker_mod)
     for attr, path in dirs.items():
-        if hasattr(utils_mod, attr):
-            monkeypatch.setattr(utils_mod, attr, path)
-        if hasattr(watcher_mod, attr):
-            monkeypatch.setattr(watcher_mod, attr, path)
-        if hasattr(orch_mod, attr):
-            monkeypatch.setattr(orch_mod, attr, path)
+        for mod in all_mods:
+            if hasattr(mod, attr):
+                monkeypatch.setattr(mod, attr, path)
 
     # Patch non-dir constants too
-    for mod in (utils_mod, watcher_mod, orch_mod):
+    for mod in all_mods:
         if hasattr(mod, "DASHBOARD"):
             monkeypatch.setattr(mod, "DASHBOARD", dashboard)
         if hasattr(mod, "PROJECT_ROOT"):

@@ -1,0 +1,158 @@
+
+
+**Metadata:**
+- skill_name: email_triage
+- version: 2.0.0
+- category: communication
+- difficulty: intermediate
+- estimated_time: 3_minutes
+- tier: silver
+
+**Purpose:**
+Automatically categorize incoming emails by priority, type, and required action.
+
+**Input:**
+- Email files from /Inbox (created by gmail_watcher)
+
+**Processing Logic:**
+
+### Priority Detection
+**URGENT** (process within 1 hour):
+- Keywords: urgent, ASAP, critical, emergency, deadline today
+- From: clients, boss, VIP contacts
+- Subject contains: !!! or [URGENT]
+- Time-sensitive: expires within 24h
+
+**HIGH** (process within 24 hours):
+- Keywords: important, need, required, deadline this week
+- From: known business contacts
+- Contains: invoice, payment, contract
+- Deadline: within 3 days
+
+**NORMAL** (process within 3 days):
+- Standard business emails
+- Newsletters from trusted sources
+- Regular updates
+
+**LOW** (process when convenient):
+- Newsletters
+- Marketing emails
+- FYI messages
+- No action required
+
+### Category Classification
+- **Action Required**: Needs response or action
+- **FYI**: Informational only
+- **Newsletter**: Subscription content
+- **Spam**: Promotional/unwanted
+- **Automated**: System notifications
+
+### Detailed Instructions:
+
+**Step 1: Read Email Metadata**
+```yaml
+from: sender@example.com
+subject: Invoice Payment Due Tomorrow
+received: 2026-01-07T10:30:00Z
+body_preview: Your invoice #1234 is due tomorrow...
+```
+
+**Step 2: Analyze Sender**
+- Is sender in whitelist (VIP contacts)?
+- Is sender in blacklist (spam)?
+- Is sender domain trusted?
+- First-time sender or known contact?
+
+**Step 3: Analyze Subject & Body**
+- Extract keywords
+- Detect deadlines
+- Identify action items
+- Check for urgency indicators
+
+**Step 4: Create Categorized File**
+```markdown
+---
+type: email
+priority: <URGENT|HIGH|NORMAL|LOW>
+category: <ACTION|FYI|NEWSLETTER|SPAM|AUTOMATED>
+sender: sender@example.com
+sender_name: John Doe
+sender_trust: <VIP|KNOWN|UNKNOWN|SPAM>
+subject: <SUBJECT>
+received: <ISO_TIMESTAMP>
+deadline: <ISO_TIMESTAMP_OR_NONE>
+action_required: <true|false>
+requires_approval: <true|false>
+tags: [<TAG1>, <TAG2>]
+triaged_at: <ISO_TIMESTAMP>
+status: triaged
+---
+
+# Email: <SUBJECT>
+
+## Summary
+<ONE_SENTENCE_SUMMARY>
+
+## Sender Information
+- **Name**: <NAME>
+- **Email**: <EMAIL>
+- **Trust Level**: <VIP|KNOWN|UNKNOWN>
+- **Previous Emails**: <COUNT>
+
+## Content Analysis
+**Key Points:**
+- Point 1
+- Point 2
+
+**Action Items:**
+- [ ] Action 1
+- [ ] Action 2
+
+**Deadlines:**
+- Deadline 1: <DATE>
+
+## Recommended Response
+<SUGGESTED_ACTION>
+
+## Next Steps
+<WHAT_SHOULD_HAPPEN_NEXT>
+
+---
+Original email body:
+<EMAIL_BODY>
+```
+
+**Step 5: Route to Appropriate Folder**
+- URGENT → /Needs_Action (immediate processing)
+- HIGH → /Needs_Action
+- NORMAL → /Inbox (queue for batch processing)
+- LOW → /Inbox
+- SPAM → /Archive or delete
+
+**Step 6: Update Dashboard**
+Add to pending emails count
+
+**Step 7: Log**
+```
+[TIMESTAMP] Email triaged - Priority: HIGH, From: client@example.com, Subject: Invoice Due
+```
+
+**Success Criteria:**
+- All emails categorized correctly
+- Priority accurately assigned
+- Action items identified
+- Dashboard updated
+- No false positives (non-spam marked as spam)
+
+**Whitelist/Blacklist Management:**
+Store in /Contacts/email_whitelist.json and /Contacts/email_blacklist.json
+
+**Common Patterns:**
+- "Payment due" → HIGH, Financial
+- "Meeting tomorrow" → URGENT, Calendar
+- "FYI" in subject → LOW, Informational
+- Newsletter subscription → LOW, Newsletter
+
+Save as SKILL.md in Skills/email_triage/
+PROMPT
+
