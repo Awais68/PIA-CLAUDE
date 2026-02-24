@@ -4,7 +4,7 @@ This daemon runs continuously and:
 1. Monitors Tweet_Queue.md for scheduled tweets
 2. Creates approval requests when scheduled time arrives
 3. Monitors /Approved/ folder and posts approved content to both platforms
-4. Runs every 5 minutes
+4. Runs every 1 minute (FAST MODE)
 
 Usage: uv run zoya-social-daemon
 """
@@ -24,7 +24,7 @@ from src.utils import setup_logger
 logger = setup_logger("social_daemon")
 
 TWEET_QUEUE_FILE = VAULT_PATH / "Business" / "Tweet_Queue.md"
-CHECK_INTERVAL = 300  # 5 minutes
+CHECK_INTERVAL = 60  # 1 minute (FAST MODE)
 
 
 def parse_scheduled_tweets() -> list[dict]:
