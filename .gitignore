@@ -1,9 +1,13 @@
+# PLATINUM TIER — CRITICAL: Block all secrets
 # OS
 .DS_Store
+Thumbs.db
 
 # Secrets — NEVER commit any of these
 .env
 .env.*
+.env.local
+.env.*.local
 credentials.json
 token.json
 *_token.json
@@ -13,26 +17,82 @@ oauth_token*
 twitter_token*
 linkedin_token*
 whatsapp_token*
+banking_tokens/
+secrets/
+.secrets/
+*.key
+*.pem
+*.keychain
+whatsapp_session/
+whatsapp_session.json
+oauth_session.json
 
 # Python
 __pycache__/
 *.pyc
-.venv/
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
 *.egg-info/
+.venv/
+venv/
+ENV/
+env/
+
+# Virtual environments
+env.bak/
+venv.bak/
 
 # Node
 node_modules/
+npm-debug.log
 dist/
 coverage/
 
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code
+.claude/
+.claude/memory/
+
+# PM2
+.pm2/
+ecosystem-lock.json
+
+# Local logs & temp (NOT synced)
+logs/
+tmp/
+.tmp/
+.quarantine/
+.backup_*
+
 # Vault runtime artifacts (tracked via .gitkeep, not contents)
-AI_Employee_Vault/Inbox/*
 AI_Employee_Vault/Needs_Action/*
 AI_Employee_Vault/In_Progress/*
 AI_Employee_Vault/Done/*
-AI_Employee_Vault/Quarantine/*
+AI_Employee_Vault/Queue/*
 AI_Employee_Vault/Logs/*
-!AI_Employee_Vault/*/.gitkeep
+AI_Employee_Vault/Archive/*
+AI_Employee_Vault/Approved/*
+AI_Employee_Vault/Rejected/*
+!AI_Employee_Vault/**/.gitkeep
 
 # Lock files (runtime)
 *.lock.pid

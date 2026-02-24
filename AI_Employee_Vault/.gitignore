@@ -1,0 +1,23 @@
+# VAULT-SPECIFIC .gitignore
+# Extra protection layer: blocks local-only secrets from ever syncing
+# Even though this vault is synced to Git, these NEVER go to remote
+
+# Local-only secrets (NEVER to cloud)
+.env.local
+whatsapp_session/
+whatsapp_session.json
+banking_tokens/
+secrets/
+.secrets/
+*.keychain
+oauth_session.json
+
+# Application cache/artifacts (not needed in sync)
+.pytest_cache/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# Backup files
+.backup_*
