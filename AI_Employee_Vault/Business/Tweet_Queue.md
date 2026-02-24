@@ -19,9 +19,12 @@ request in `/Pending_Approval/` — you must approve before anything is publishe
 
 <!-- Add your tweets below. Zoya processes this list every 30 minutes. -->
 
-- [ ] scheduled_for: 2026-02-23 09:00 UTC | Exciting things happening at the studio this week. Stay tuned. #BuildingInPublic #AI
-- [ ] scheduled_for: 2026-02-24 12:00 UTC | Automation doesn't replace you — it removes the work that was replacing you. #AIEmployee #Productivity
-- [ ] scheduled_for: 2026-02-25 17:00 UTC | What does your Monday morning routine look like? Ours now starts with an AI briefing. #ZoyaAI
+- [x] scheduled_for: 2026-02-23 09:00 UTC | Exciting things happening at the studio this week. Stay tuned. #BuildingInPublic #AI
+- [x] scheduled_for: 2026-02-24 12:00 UTC | Automation doesn't replace you — it removes the work that was replacing you. #AIEmployee #Productivity
+- [ ] scheduled_for: 2026-02-24 18:00 UTC | 🤖 Built an AI that processes 60+ documents without cloud. Multi-channel ingestion, HITL approval, complete audit trail. This is enterprise automation. #AI #Automation
+- [ ] scheduled_for: 2026-02-25 10:00 UTC | Email → Invoice Processing. WhatsApp → Business Tasks. File Drop → Auto-categorization. The future is local-first architecture + Claude reasoning. #AIRevolution
+- [ ] scheduled_for: 2026-02-25 17:00 UTC | What does your morning routine look like? Ours now: AI reads inbox, processes documents, generates briefing. All audited. Zero magic. #ZoyaAI #Productivity
+- [ ] scheduled_for: 2026-02-26 12:00 UTC | 100% processing success rate. 60+ documents. 3 data sources. 0 cloud dependencies. Zoya: When you give an AI proper structure, magic happens. #DeveloperLife
 
 ---
 

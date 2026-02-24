@@ -1,0 +1,13 @@
+{
+  "task_id": "stuck_FILE_20260220_213151_EMAIL_20260220_213120_Awais__you_re_now_a_member_of_Empire_Of_Ai__-_tools",
+  "task_prompt": "You are Zoya. A task file has been stuck in In_Progress for 5384 minutes.\n\n**Stuck file:** `/media/awais/6372445e-8fda-42fa-9034-61babd7dafd1/150 GB DATA TRANSFER/hackathon series/0 FTE Hackathon/PIA-CLAUDE/AI_Employee_Vault/In_Progress/FILE_20260220_213151_EMAIL_20260220_213120_Awais__you_re_now_a_member_of_Empire_Of_Ai__-_tools.md`\n\nPlease:\n1. Read the stuck metadata file\n2. Determine what processing was needed\n3. Complete the processing using the inbox-processor skill\n4. Update the frontmatter status to 'done'\n5. Do NOT move files \u2014 the orchestrator handles that\n\nConfirm completion by writing 'Processing complete' in your response.",
+  "task_type": "default",
+  "max_iterations": 5,
+  "completion_promise": "Processing complete",
+  "watch_glob": null,
+  "current_iteration": 1,
+  "started_at": "2026-02-24T15:23:13.806425+00:00",
+  "status": "running",
+  "outputs": [],
+  "dry_run": false
+}

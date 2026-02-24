@@ -38,7 +38,7 @@ echo ""
 
 # Ensure Gold vault folders exist
 echo "[Zoya] Initializing Gold vault folders..."
-python -c "
+python3 -c "
 from pathlib import Path
 import src.config as cfg
 for folder in [cfg.BRIEFINGS, cfg.CONTACTS]:

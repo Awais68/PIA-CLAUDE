@@ -394,7 +394,7 @@ def _process_with_claude(meta_path: Path, companion: Path | None) -> bool:
             ["claude", "--print", "--dangerously-skip-permissions", prompt],
             capture_output=True,
             text=True,
-            timeout=120,
+            timeout=300,
             cwd=str(PROJECT_ROOT),
             env=env,
         )
@@ -485,11 +485,8 @@ def handle_failure(meta_path: Path, companion: Path | None) -> None:
 
 
 def update_dashboard() -> None:
-    """Refresh Dashboard.md using the configured AI provider."""
-    if AI_PROVIDER in ("qwen", "ollama"):
-        _update_dashboard_local()
-    else:
-        _update_dashboard_claude()
+    """Refresh Dashboard.md — always uses local Python to avoid subprocess nesting."""
+    _update_dashboard_local()
 
 
 def _update_dashboard_claude() -> None:

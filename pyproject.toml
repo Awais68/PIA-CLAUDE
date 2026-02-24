@@ -33,6 +33,7 @@ zoya-ralph = "src.ralph_wiggum:main"
 zoya-bank = "src.watchers.bank_watcher:main"
 zoya-smart-reply = "src.automations.smart_reply:main"
 zoya-log-janitor = "src.log_janitor:main"
+zoya-social-daemon = "src.social_media_daemon:main"
 
 [build-system]
 requires = ["hatchling"]
