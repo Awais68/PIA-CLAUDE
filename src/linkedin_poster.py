@@ -14,6 +14,7 @@ SAFETY: All posts go through HITL approval. Never auto-publish.
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -25,6 +26,7 @@ from src.config import (
     LINKEDIN_ACCESS_TOKEN,
     LINKEDIN_DRY_RUN,
     LINKEDIN_PAGE_ID,
+    LINKEDIN_PERSON_URN,
     PENDING_APPROVAL,
 )
 from src.utils import log_action, setup_logger
@@ -122,7 +124,13 @@ def post_to_linkedin(content: str) -> bool:
     }
 
     # Build UGC post payload
-    author = f"urn:li:organization:{LINKEDIN_PAGE_ID}" if LINKEDIN_PAGE_ID else "urn:li:person:me"
+    if LINKEDIN_PAGE_ID:
+        author = f"urn:li:organization:{LINKEDIN_PAGE_ID}"
+    elif LINKEDIN_PERSON_URN:
+        author = LINKEDIN_PERSON_URN
+    else:
+        logger.error("Neither LINKEDIN_PAGE_ID nor LINKEDIN_PERSON_URN is set")
+        return False
     payload = {
         "author": author,
         "lifecycleState": "PUBLISHED",
@@ -160,19 +168,13 @@ def process_approved_posts() -> int:
     for md_file in sorted(APPROVED.glob("LINKEDIN_*.md")):
         content = md_file.read_text(encoding="utf-8")
 
-        # Extract the draft post section
-        post_text = ""
-        in_draft = False
-        for line in content.splitlines():
-            if line.strip() == "## Draft Post":
-                in_draft = True
-                continue
-            if in_draft and line.startswith("## "):
-                break
-            if in_draft:
-                post_text += line + "\n"
+        # Extract content after frontmatter
+        match = re.search(r"^---\s*\n(.*?)\n---\s*\n(.+)", content, re.DOTALL)
+        if not match:
+            logger.warning("Invalid format in %s", md_file.name)
+            continue
 
-        post_text = post_text.strip()
+        post_text = match.group(2).strip()
         if not post_text:
             logger.warning("Empty post content in %s, skipping", md_file.name)
             continue

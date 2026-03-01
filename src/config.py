@@ -77,6 +77,7 @@ LINKEDIN_CLIENT_ID = os.getenv("LINKEDIN_CLIENT_ID", "")
 LINKEDIN_CLIENT_SECRET = os.getenv("LINKEDIN_CLIENT_SECRET", "")
 LINKEDIN_ACCESS_TOKEN = os.getenv("LINKEDIN_ACCESS_TOKEN", "")
 LINKEDIN_PAGE_ID = os.getenv("LINKEDIN_PAGE_ID", "")
+LINKEDIN_PERSON_URN = os.getenv("LINKEDIN_PERSON_URN", "")
 LINKEDIN_DRY_RUN = os.getenv("LINKEDIN_DRY_RUN", "true").lower() == "true"
 
 # WhatsApp Business API (Meta Cloud API)
