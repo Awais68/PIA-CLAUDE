@@ -21,6 +21,7 @@ Dependencies:
 
 from __future__ import annotations
 
+import re
 import shutil
 from datetime import datetime, timezone
 from pathlib import Path
@@ -145,19 +146,13 @@ def process_approved_tweets() -> int:
     for md_file in sorted(APPROVED.glob("TWITTER_*.md")):
         text = md_file.read_text(encoding="utf-8")
 
-        # Extract the draft tweet section
-        tweet_text = ""
-        in_draft = False
-        for line in text.splitlines():
-            if line.strip() == "## Draft Tweet":
-                in_draft = True
-                continue
-            if in_draft and line.startswith("## "):
-                break
-            if in_draft:
-                tweet_text += line + "\n"
+        # Extract content after frontmatter
+        match = re.search(r"^---\s*\n(.*?)\n---\s*\n(.+)", text, re.DOTALL)
+        if not match:
+            logger.warning("Invalid format in %s", md_file.name)
+            continue
 
-        tweet_text = tweet_text.strip()
+        tweet_text = match.group(2).strip()
         if not tweet_text:
             logger.warning("Empty tweet content in %s, skipping", md_file.name)
             continue

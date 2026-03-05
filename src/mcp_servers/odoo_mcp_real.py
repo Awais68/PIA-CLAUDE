@@ -7,9 +7,9 @@ import xmlrpc.client
 from datetime import datetime, timedelta
 
 from src.config import PROJECT_ROOT
-from src.utils.logging_utils import setup_logging, log_action, log_error
+from src.utils import setup_logger, log_action
 
-logger = setup_logging()
+logger = setup_logger("odoo")
 
 
 class OdooMCPServer:
@@ -69,7 +69,7 @@ class OdooMCPServer:
 
         except Exception as e:
             logger.error(f"❌ Failed to authenticate with Odoo: {e}")
-            log_error("odoo_auth_failed", str(e))
+            log_action("odoo_auth_failed", str(e), result="error")
             return False
 
     def create_invoice(
@@ -192,7 +192,7 @@ class OdooMCPServer:
 
         except Exception as e:
             logger.error(f"❌ Failed to create invoice: {e}")
-            log_error("odoo_invoice_failed", str(e))
+            log_action("odoo_invoice_failed", str(e), result="error")
             return {"success": False, "error": str(e)}
 
     def _get_or_create_partner(self, name: str) -> int:

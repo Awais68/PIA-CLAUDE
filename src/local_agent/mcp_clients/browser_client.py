@@ -5,9 +5,9 @@ Interface to browser automation for payments and other web tasks
 
 from typing import Optional, Dict, Any
 from datetime import datetime
-from src.utils.logging_utils import setup_logging, log_action, log_error
+from src.utils import setup_logger, log_action
 
-logger = setup_logging()
+logger = setup_logger("browser")
 
 
 class BrowserMCPClient:

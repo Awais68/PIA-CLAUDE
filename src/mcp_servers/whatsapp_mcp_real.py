@@ -7,9 +7,9 @@ import requests
 from datetime import datetime
 
 from src.config import PROJECT_ROOT
-from src.utils.logging_utils import setup_logging, log_action, log_error
+from src.utils import setup_logger, log_action
 
-logger = setup_logging()
+logger = setup_logger("whatsapp_mcp")
 
 
 class WhatsAppMCPServer:
@@ -90,12 +90,12 @@ class WhatsAppMCPServer:
                 log_action(
                     "whatsapp_message_sent",
                     recipient_phone,
-                    "success",
                     {
                         "message_id": message_id,
                         "message_length": len(message_text),
                         "timestamp": datetime.utcnow().isoformat()
-                    }
+                    },
+                    result="success"
                 )
                 return {
                     "success": True,
@@ -106,7 +106,7 @@ class WhatsAppMCPServer:
             else:
                 error_msg = f"Status {response.status_code}: {response.text}"
                 logger.error(f"❌ WhatsApp API error: {error_msg}")
-                log_error("whatsapp_send_failed", error_msg, {"to": recipient_phone})
+                log_action("whatsapp_send_failed", error_msg, {"to": recipient_phone}, result="error")
                 return {
                     "success": False,
                     "error": error_msg
@@ -114,11 +114,11 @@ class WhatsAppMCPServer:
 
         except requests.RequestException as e:
             logger.error(f"❌ WhatsApp request failed: {e}")
-            log_error("whatsapp_request_failed", str(e))
+            log_action("whatsapp_request_failed", str(e), result="error")
             return {"success": False, "error": str(e)}
         except Exception as e:
             logger.error(f"❌ Failed to send WhatsApp message: {e}")
-            log_error("whatsapp_failed", str(e))
+            log_action("whatsapp_failed", str(e), result="error")
             return {"success": False, "error": str(e)}
 
     def send_alert(

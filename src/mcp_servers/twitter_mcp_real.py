@@ -12,9 +12,9 @@ from src.config import (
     TWITTER_ACCESS_TOKEN,
     TWITTER_ACCESS_TOKEN_SECRET
 )
-from src.utils.logging_utils import setup_logging, log_action, log_error
+from src.utils import setup_logger, log_action
 
-logger = setup_logging()
+logger = setup_logger("twitter_mcp")
 
 
 class TwitterMCPServer:
@@ -61,11 +61,11 @@ class TwitterMCPServer:
 
         except tweepy.TweepyException as e:
             logger.error(f"❌ Twitter authentication error: {e}")
-            log_error("twitter_auth_failed", str(e))
+            log_action("twitter_auth_failed", str(e), result="error")
             return False
         except Exception as e:
             logger.error(f"❌ Failed to initialize Twitter client: {e}")
-            log_error("twitter_init_failed", str(e))
+            log_action("twitter_init_failed", str(e), result="error")
             return False
 
     def post_tweet(
@@ -114,12 +114,12 @@ class TwitterMCPServer:
                 log_action(
                     "tweet_posted",
                     "twitter",
-                    "success",
                     {
                         "tweet_id": tweet_id,
                         "text_length": len(text),
                         "timestamp": datetime.utcnow().isoformat()
-                    }
+                    },
+                    result="success"
                 )
                 return {
                     "success": True,
@@ -132,11 +132,11 @@ class TwitterMCPServer:
 
         except tweepy.TweepyException as e:
             logger.error(f"❌ Twitter API error: {e}")
-            log_error("tweet_post_failed", str(e), {"text": text[:100]})
+            log_action("tweet_post_failed", str(e), {"text": text[:100]}, result="error")
             return {"success": False, "error": str(e)}
         except Exception as e:
             logger.error(f"❌ Failed to post tweet: {e}")
-            log_error("tweet_failed", str(e))
+            log_action("tweet_failed", str(e), result="error")
             return {"success": False, "error": str(e)}
 
     def get_user_info(self) -> dict:

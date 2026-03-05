@@ -7,9 +7,9 @@ import requests
 from datetime import datetime
 
 from src.config import PROJECT_ROOT
-from src.utils.logging_utils import setup_logging, log_action, log_error
+from src.utils import setup_logger, log_action
 
-logger = setup_logging()
+logger = setup_logger("meta")
 
 
 class MetaMCPServer:
@@ -122,11 +122,11 @@ class MetaMCPServer:
 
         except requests.RequestException as e:
             logger.error(f"❌ Instagram request failed: {e}")
-            log_error("instagram_post_failed", str(e))
+            log_action("instagram_post_failed", str(e), result="error")
             return {"success": False, "error": str(e)}
         except Exception as e:
             logger.error(f"❌ Failed to post to Instagram: {e}")
-            log_error("instagram_failed", str(e))
+            log_action("instagram_failed", str(e), result="error")
             return {"success": False, "error": str(e)}
 
     def post_to_facebook(
@@ -192,11 +192,11 @@ class MetaMCPServer:
 
         except requests.RequestException as e:
             logger.error(f"❌ Facebook request failed: {e}")
-            log_error("facebook_post_failed", str(e))
+            log_action("facebook_post_failed", str(e), result="error")
             return {"success": False, "error": str(e)}
         except Exception as e:
             logger.error(f"❌ Failed to post to Facebook: {e}")
-            log_error("facebook_failed", str(e))
+            log_action("facebook_failed", str(e), result="error")
             return {"success": False, "error": str(e)}
 
     def get_page_info(self) -> dict:

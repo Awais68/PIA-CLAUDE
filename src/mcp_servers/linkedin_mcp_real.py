@@ -10,9 +10,9 @@ from src.config import (
     LINKEDIN_ACCESS_TOKEN,
     LINKEDIN_PAGE_ID
 )
-from src.utils.logging_utils import setup_logging, log_action, log_error
+from src.utils import setup_logger, log_action
 
-logger = setup_logging()
+logger = setup_logger("linkedin")
 
 
 class LinkedInMCPServer:
@@ -32,6 +32,15 @@ class LinkedInMCPServer:
             "Content-Type": "application/json",
             "X-Requested-With": "XMLHttpRequest"
         }
+
+    def post_to_linkedin(
+        self,
+        text: str,
+        image_url: str = None,
+        video_url: str = None
+    ) -> dict:
+        """Post to LinkedIn (alias for post_to_page)"""
+        return self.post_to_page(text, image_url, video_url)
 
     def post_to_page(
         self,
@@ -100,12 +109,12 @@ class LinkedInMCPServer:
                 log_action(
                     "linkedin_post_created",
                     "linkedin",
-                    "success",
                     {
                         "post_id": post_id,
                         "text_length": len(text),
                         "timestamp": datetime.utcnow().isoformat()
-                    }
+                    },
+                    result="success"
                 )
                 return {
                     "success": True,
@@ -115,7 +124,7 @@ class LinkedInMCPServer:
             else:
                 error_msg = f"Status {response.status_code}: {response.text}"
                 logger.error(f"❌ LinkedIn API error: {error_msg}")
-                log_error("linkedin_post_failed", error_msg, {"text": text[:100]})
+                log_action("linkedin_post_failed", error_msg, {"text": text[:100]}, result="error")
                 return {
                     "success": False,
                     "error": error_msg
@@ -123,11 +132,11 @@ class LinkedInMCPServer:
 
         except requests.RequestException as e:
             logger.error(f"❌ LinkedIn request failed: {e}")
-            log_error("linkedin_request_failed", str(e))
+            log_action("linkedin_request_failed", str(e), result="error")
             return {"success": False, "error": str(e)}
         except Exception as e:
             logger.error(f"❌ Failed to post to LinkedIn: {e}")
-            log_error("linkedin_post_failed", str(e))
+            log_action("linkedin_post_failed", str(e), result="error")
             return {"success": False, "error": str(e)}
 
     def get_page_info(self) -> dict:

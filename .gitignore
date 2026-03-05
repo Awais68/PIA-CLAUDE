@@ -5,6 +5,7 @@ Thumbs.db
 
 # Secrets — NEVER commit any of these
 .env
+.env gulzar bibi
 .env.*
 .env.local
 .env.*.local
@@ -100,3 +101,7 @@ AI_Employee_Vault/Rejected/*
 # uv
 uv.lock
 FTE.ENV
+
+# WhatsApp Watcher
+processed_ids.json
+whatsapp_watcher.log

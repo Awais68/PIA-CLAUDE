@@ -16,9 +16,9 @@ from google.api_core.exceptions import GoogleAPIError
 from googleapiclient.discovery import build
 
 from src.config import PROJECT_ROOT
-from src.utils.logging_utils import setup_logging, log_action, log_error
+from src.utils import setup_logger, log_action
 
-logger = setup_logging()
+logger = setup_logger("gmail")
 
 # Gmail API scopes
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
@@ -31,7 +31,8 @@ class GmailMCPServer:
         """Initialize Gmail API client"""
         self.service = None
         self.credentials = None
-        self._authenticate()
+        self.authenticated = False
+        self.authenticated = self._authenticate()
 
     def _authenticate(self) -> bool:
         """
@@ -46,8 +47,7 @@ class GmailMCPServer:
 
             # Load existing token if available
             if token_file.exists():
-                with open(token_file, 'rb') as token:
-                    self.credentials = pickle.load(token)
+                self.credentials = Credentials.from_authorized_user_file(str(token_file), SCOPES)
 
             # Refresh or obtain new credentials
             if self.credentials and self.credentials.expired:
@@ -62,8 +62,7 @@ class GmailMCPServer:
                 self.credentials = flow.run_local_server(port=0)
 
                 # Save credentials for next time
-                with open(token_file, 'wb') as token:
-                    pickle.dump(self.credentials, token)
+                token_file.write_text(self.credentials.to_json())
 
             # Build Gmail service
             self.service = build('gmail', 'v1', credentials=self.credentials)
@@ -72,7 +71,7 @@ class GmailMCPServer:
 
         except Exception as e:
             logger.error(f"❌ Gmail authentication failed: {e}")
-            log_error("gmail_auth_failed", str(e))
+            log_action("gmail_auth_failed", "gmail", {"error": str(e)}, "error")
             return False
 
     def send_email(
@@ -142,11 +141,11 @@ class GmailMCPServer:
 
         except GoogleAPIError as e:
             logger.error(f"❌ Gmail API error: {e}")
-            log_error("gmail_send_failed", str(e), {"to": to, "subject": subject})
+            log_action("gmail_send_failed", to, {"subject": subject, "error": str(e)}, "error")
             return False
         except Exception as e:
             logger.error(f"❌ Failed to send email: {e}")
-            log_error("email_send_failed", str(e), {"to": to})
+            log_action("email_send_failed", to, {"error": str(e)}, "error")
             return False
 
     def get_quota(self) -> dict:

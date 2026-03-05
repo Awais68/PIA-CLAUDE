@@ -4,9 +4,9 @@ Interface to WhatsApp via MCP server (local session only)
 """
 
 from typing import Optional, Dict, Any
-from src.utils.logging_utils import setup_logging, log_action, log_error
+from src.utils import setup_logger, log_action
 
-logger = setup_logging()
+logger = setup_logger("whatsapp")
 
 
 class WhatsAppMCPClient:
@@ -47,7 +47,7 @@ class WhatsAppMCPClient:
             return True
         except Exception as e:
             logger.error(f"Failed to connect to WhatsApp MCP: {e}")
-            log_error("whatsapp_mcp_connect_failed", str(e))
+            log_action("whatsapp_mcp_connect_failed", "whatsapp", {"error": str(e)}, "error")
             return False
 
     def send_message(
@@ -92,17 +92,18 @@ class WhatsAppMCPClient:
             log_action(
                 "whatsapp_message_sent",
                 recipient,
-                "success",
-                {"message_length": len(message), "media": bool(media_file)}
+                {"message_length": len(message), "media": bool(media_file)},
+                "success"
             )
             return True
 
         except Exception as e:
             logger.error(f"Failed to send WhatsApp message: {e}")
-            log_error(
+            log_action(
                 "whatsapp_send_failed",
-                str(e),
-                {"recipient": recipient}
+                recipient,
+                {"error": str(e)},
+                "error"
             )
             return False
 
@@ -146,17 +147,18 @@ class WhatsAppMCPClient:
             log_action(
                 "whatsapp_alert_sent",
                 recipient,
-                "success",
-                {"alert_type": alert_type}
+                {"alert_type": alert_type},
+                "success"
             )
             return True
 
         except Exception as e:
             logger.error(f"Failed to send WhatsApp alert: {e}")
-            log_error(
+            log_action(
                 "whatsapp_alert_failed",
-                str(e),
-                {"recipient": recipient, "alert_type": alert_type}
+                recipient,
+                {"error": str(e), "alert_type": alert_type},
+                "error"
             )
             return False
 

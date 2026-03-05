@@ -4,9 +4,9 @@ Interface to Gmail/email sending via MCP server
 """
 
 from typing import Optional, Dict, Any
-from src.utils.logging_utils import setup_logging, log_action, log_error
+from src.utils import setup_logger, log_action
 
-logger = setup_logging()
+logger = setup_logger("email")
 
 
 class EmailMCPClient:
@@ -45,7 +45,7 @@ class EmailMCPClient:
             return True
         except Exception as e:
             logger.error(f"Failed to connect to email MCP: {e}")
-            log_error("email_mcp_connect_failed", str(e))
+            log_action("email_mcp_connect_failed", "email", {"error": str(e)}, "error")
             return False
 
     def send_email(
@@ -92,12 +92,12 @@ class EmailMCPClient:
             # return response.get("success", False)
 
             logger.info(f"✅ Email sent to {to}: {subject}")
-            log_action("email_sent", to, "success", {"subject": subject})
+            log_action("email_sent", to, {"subject": subject}, "success")
             return True
 
         except Exception as e:
             logger.error(f"Failed to send email: {e}")
-            log_error("email_send_failed", str(e), {"to": to, "subject": subject})
+            log_action("email_send_failed", to, {"error": str(e), "subject": subject}, "error")
             return False
 
     def _call_mcp(self, request: Dict[str, Any]) -> Dict[str, Any]:

@@ -11,6 +11,9 @@ secrets/
 .secrets/
 *.keychain
 oauth_session.json
+credentials.json
+token.json
+
 
 # Application cache/artifacts (not needed in sync)
 .pytest_cache/
