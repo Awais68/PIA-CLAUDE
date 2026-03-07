@@ -1,0 +1,97 @@
+2026-03-07 06:07:49,185 - __main__ - INFO - 
+============================================================
+2026-03-07 06:07:49,185 - __main__ - INFO - 🎭 PLAYWRIGHT TEST SUITE
+2026-03-07 06:07:49,185 - __main__ - INFO - ============================================================
+
+2026-03-07 06:07:49,185 - __main__ - INFO - ============================================================
+2026-03-07 06:07:49,185 - __main__ - INFO - 🔵 TESTING LINKEDIN PLAYWRIGHT
+2026-03-07 06:07:49,185 - __main__ - INFO - ============================================================
+2026-03-07 06:07:49,185 - __main__ - INFO - 📍 Test 1: Initialize LinkedIn Playwright...
+2026-03-07 06:07:49,185 - __main__ - INFO - ✅ LinkedInPlaywright initialized
+2026-03-07 06:07:49,185 - __main__ - INFO - 📍 Test 2: Login to LinkedIn...
+2026-03-07 06:07:49,462 - src.playwright_utils - INFO - ✅ Valid session found at /media/awais/6372445e-8fda-42fa-9034-61babd7dafd1/150 GB DATA TRANSFER/hackathon series/0 FTE Hackathon/PIA-CLAUDE/linkedin_session/state.json
+2026-03-07 06:07:49,462 - src.automations.linkedin_playwright - INFO - ℹ️ Loading saved LinkedIn session...
+2026-03-07 06:07:55,360 - src.automations.linkedin_playwright - INFO - ✅ LinkedIn session restored successfully
+2026-03-07 06:07:55,361 - __main__ - INFO - ✅ LinkedIn login successful
+2026-03-07 06:07:55,361 - __main__ - INFO - ✅ Session file saved: /media/awais/6372445e-8fda-42fa-9034-61babd7dafd1/150 GB DATA TRANSFER/hackathon series/0 FTE Hackathon/PIA-CLAUDE/linkedin_session/state.json
+2026-03-07 06:07:55,361 - __main__ - INFO - 📍 Test 3: Posting message to LinkedIn...
+2026-03-07 06:07:55,361 - src.automations.linkedin_playwright - INFO - ℹ️ Navigating to feed page...
+2026-03-07 06:07:59,772 - src.automations.linkedin_playwright - ERROR - ❌ Could not find post button
+2026-03-07 06:07:59,888 - src.playwright_utils - INFO - 📸 Error screenshot saved: /media/awais/6372445e-8fda-42fa-9034-61babd7dafd1/150 GB DATA TRANSFER/hackathon series/0 FTE Hackathon/PIA-CLAUDE/playwright_errors/linkedin_post_button_not_found_20260307_060759.png
+2026-03-07 06:07:59,888 - __main__ - ERROR - ❌ Failed to post to LinkedIn
+2026-03-07 06:07:59,888 - __main__ - INFO - ============================================================
+2026-03-07 06:07:59,888 - __main__ - INFO - 🟢 TESTING WHATSAPP PLAYWRIGHT
+2026-03-07 06:07:59,888 - __main__ - INFO - ============================================================
+2026-03-07 06:07:59,888 - __main__ - INFO - 📍 Test 1: Initialize WhatsApp Playwright...
+2026-03-07 06:07:59,889 - __main__ - INFO - ✅ WhatsAppPlaywright initialized
+2026-03-07 06:07:59,889 - __main__ - INFO - 📍 Test 2: Login to WhatsApp Web...
+2026-03-07 06:07:59,889 - __main__ - INFO -    If QR code appears, scan it with your phone
+2026-03-07 06:08:00,182 - src.automations.whatsapp_playwright - INFO - ℹ️ Launching browser with persistent context...
+2026-03-07 06:08:00,519 - src.automations.whatsapp_playwright - INFO - ℹ️ Navigating to WhatsApp Web...
+2026-03-07 06:08:07,078 - src.automations.whatsapp_playwright - INFO - 🔐 QR code detected - Please scan with your phone
+2026-03-07 06:08:07,098 - src.automations.whatsapp_playwright - INFO -    Waiting for QR scan... (0s)
+2026-03-07 06:08:17,215 - src.automations.whatsapp_playwright - INFO -    Waiting for QR scan... (10s)
+2026-03-07 06:08:27,337 - src.automations.whatsapp_playwright - INFO -    Waiting for QR scan... (20s)
+2026-03-07 06:08:38,506 - src.automations.whatsapp_playwright - INFO -    Waiting for QR scan... (30s)
+2026-03-07 06:08:39,513 - src.automations.whatsapp_playwright - INFO - ✅ QR code scanned successfully
+2026-03-07 06:08:59,538 - src.automations.whatsapp_playwright - INFO - ✅ Chat interface loaded (selector: div[aria-label*='Chat'])
+2026-03-07 06:09:01,556 - src.automations.whatsapp_playwright - INFO - 💾 WhatsApp session saved to /media/awais/6372445e-8fda-42fa-9034-61babd7dafd1/150 GB DATA TRANSFER/hackathon series/0 FTE Hackathon/PIA-CLAUDE/whatsapp_session
+2026-03-07 06:09:01,557 - src.automations.whatsapp_playwright - INFO - ✅ WhatsApp login successful
+2026-03-07 06:09:01,557 - __main__ - INFO - ✅ WhatsApp login successful
+2026-03-07 06:09:01,557 - __main__ - INFO - ✅ Session file saved: /media/awais/6372445e-8fda-42fa-9034-61babd7dafd1/150 GB DATA TRANSFER/hackathon series/0 FTE Hackathon/PIA-CLAUDE/whatsapp_session/state.json
+2026-03-07 06:09:01,557 - __main__ - INFO - 📍 Test 3: Sending message to 'Mom'...
+2026-03-07 06:09:01,557 - src.automations.whatsapp_playwright - INFO - ℹ️ Sending message to Mom...
+2026-03-07 06:09:02,558 - src.automations.whatsapp_playwright - INFO - ℹ️ Looking for search input...
+2026-03-07 06:09:02,579 - src.automations.whatsapp_playwright - ERROR - ❌ Could not find search input
+2026-03-07 06:09:02,679 - src.playwright_utils - INFO - 📸 Error screenshot saved: /media/awais/6372445e-8fda-42fa-9034-61babd7dafd1/150 GB DATA TRANSFER/hackathon series/0 FTE Hackathon/PIA-CLAUDE/playwright_errors/whatsapp_search_input_not_found_20260307_060902.png
+2026-03-07 06:09:02,679 - __main__ - WARNING - ⚠️ Failed to send message to Mom
+2026-03-07 06:09:02,679 - __main__ - INFO -    (This may be expected if contact doesn't exist)
+2026-03-07 06:09:02,705 - src.automations.whatsapp_playwright - INFO - WhatsApp context closed
+2026-03-07 06:09:02,781 - src.automations.whatsapp_playwright - INFO - WhatsApp browser closed
+2026-03-07 06:09:02,795 - src.automations.whatsapp_playwright - INFO - Playwright stopped
+2026-03-07 06:09:02,795 - __main__ - INFO - ✅ WhatsApp tests completed
+
+2026-03-07 06:09:02,795 - __main__ - INFO - ============================================================
+2026-03-07 06:09:02,795 - __main__ - INFO - ⚙️ TESTING SYNC WRAPPERS
+2026-03-07 06:09:02,795 - __main__ - INFO - ============================================================
+2026-03-07 06:09:02,795 - __main__ - INFO - 📍 Test 1: LinkedIn sync wrapper...
+2026-03-07 06:09:03,086 - src.playwright_utils - INFO - ✅ Valid session found at /media/awais/6372445e-8fda-42fa-9034-61babd7dafd1/150 GB DATA TRANSFER/hackathon series/0 FTE Hackathon/PIA-CLAUDE/linkedin_session/state.json
+2026-03-07 06:09:03,086 - src.automations.linkedin_playwright - INFO - ℹ️ Loading saved LinkedIn session...
+2026-03-07 06:09:08,014 - src.automations.linkedin_playwright - INFO - ✅ LinkedIn session restored successfully
+2026-03-07 06:09:08,014 - src.automations.linkedin_playwright - INFO - ℹ️ Navigating to feed page...
+2026-03-07 06:09:12,397 - src.automations.linkedin_playwright - ERROR - ❌ Could not find post button
+2026-03-07 06:09:12,466 - src.playwright_utils - INFO - 📸 Error screenshot saved: /media/awais/6372445e-8fda-42fa-9034-61babd7dafd1/150 GB DATA TRANSFER/hackathon series/0 FTE Hackathon/PIA-CLAUDE/playwright_errors/linkedin_post_button_not_found_20260307_060912.png
+2026-03-07T06:09:12 [linkedin_playwright] ERROR: ❌ Failed to post to LinkedIn
+2026-03-07 06:09:12,466 - linkedin_playwright - ERROR - ❌ Failed to post to LinkedIn
+2026-03-07 06:09:12,523 - src.automations.linkedin_playwright - INFO - LinkedIn browser closed
+2026-03-07 06:09:12,524 - __main__ - WARNING - ⚠️ LinkedIn sync wrapper returned error: Failed to post content
+2026-03-07 06:09:12,524 - __main__ - INFO - 📍 Test 2: WhatsApp sync wrapper...
+2026-03-07 06:09:12,795 - src.automations.whatsapp_playwright - INFO - ℹ️ Launching browser with persistent context...
+2026-03-07 06:09:12,895 - src.automations.whatsapp_playwright - INFO - ℹ️ Navigating to WhatsApp Web...
+2026-03-07 06:09:16,700 - src.automations.whatsapp_playwright - INFO - ℹ️ Using existing WhatsApp Web session
+2026-03-07 06:09:46,710 - src.automations.whatsapp_playwright - WARNING - ⚠️ Could not detect chat list, but continuing...
+2026-03-07 06:09:48,724 - src.automations.whatsapp_playwright - INFO - 💾 WhatsApp session saved to /media/awais/6372445e-8fda-42fa-9034-61babd7dafd1/150 GB DATA TRANSFER/hackathon series/0 FTE Hackathon/PIA-CLAUDE/whatsapp_session
+2026-03-07 06:09:48,724 - src.automations.whatsapp_playwright - INFO - ✅ WhatsApp login successful
+2026-03-07 06:09:48,724 - src.automations.whatsapp_playwright - INFO - ℹ️ Sending message to Mom...
+2026-03-07 06:09:49,725 - src.automations.whatsapp_playwright - INFO - ℹ️ Looking for search input...
+2026-03-07 06:09:49,745 - src.automations.whatsapp_playwright - ERROR - ❌ Could not find search input
+2026-03-07 06:09:49,806 - src.playwright_utils - INFO - 📸 Error screenshot saved: /media/awais/6372445e-8fda-42fa-9034-61babd7dafd1/150 GB DATA TRANSFER/hackathon series/0 FTE Hackathon/PIA-CLAUDE/playwright_errors/whatsapp_search_input_not_found_20260307_060949.png
+2026-03-07T06:09:49 [whatsapp_playwright] ERROR: ❌ Failed to send message to Mom
+2026-03-07 06:09:49,806 - whatsapp_playwright - ERROR - ❌ Failed to send message to Mom
+2026-03-07 06:09:49,816 - src.automations.whatsapp_playwright - INFO - WhatsApp context closed
+2026-03-07 06:09:49,838 - src.automations.whatsapp_playwright - INFO - WhatsApp browser closed
+2026-03-07 06:09:49,848 - src.automations.whatsapp_playwright - INFO - Playwright stopped
+2026-03-07 06:09:49,849 - __main__ - WARNING - ⚠️ WhatsApp sync wrapper returned error: Failed to send message
+2026-03-07 06:09:49,849 - __main__ - INFO - ✅ Sync wrapper tests completed
+
+2026-03-07 06:09:49,849 - __main__ - INFO - ============================================================
+2026-03-07 06:09:49,849 - __main__ - INFO - 📊 TEST SUMMARY
+2026-03-07 06:09:49,849 - __main__ - INFO - ============================================================
+2026-03-07 06:09:49,849 - __main__ - INFO - LinkedIn Async: ❌ FAIL
+2026-03-07 06:09:49,849 - __main__ - INFO - WhatsApp Async: ✅ PASS
+2026-03-07 06:09:49,849 - __main__ - INFO - Sync Wrappers: ✅ PASS
+2026-03-07 06:09:49,849 - __main__ - INFO - 
+Total: 2/3 tests passed
+2026-03-07 06:09:49,849 - __main__ - WARNING - 
+⚠️  1 test(s) failed
+

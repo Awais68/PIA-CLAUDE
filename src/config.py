@@ -19,6 +19,8 @@ QUARANTINE = VAULT_PATH / "Quarantine"
 LOGS = VAULT_PATH / "Logs"
 DASHBOARD = VAULT_PATH / "Dashboard.md"
 HANDBOOK = VAULT_PATH / "Company_Handbook.md"
+TODO_FILE = VAULT_PATH / "todo.md"
+RESEARCH = VAULT_PATH / "Research"
 
 # Silver tier folders
 PLANS = VAULT_PATH / "Plans"
@@ -37,7 +39,7 @@ BANK_INBOX   = VAULT_PATH / "Inbox" / "Bank"
 BANK_ARCHIVE = VAULT_PATH / "Archive" / "Bank"
 
 # Watcher settings
-SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".md"}
+SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".md", ".txt"}
 FILE_STABILITY_WAIT = 2  # seconds to wait for file to finish writing
 FILE_STABILITY_CHECKS = 3  # number of stable size checks before accepting
 MAX_FILE_SIZE_MB = 10
@@ -102,6 +104,17 @@ ODOO_DB = os.getenv("ODOO_DB", "")
 ODOO_USERNAME = os.getenv("ODOO_USERNAME") or os.getenv("ODOO_USER", "admin")
 ODOO_API_KEY = os.getenv("ODOO_API_KEY", "")
 ODOO_PASSWORD = os.getenv("ODOO_PASSWORD") or ODOO_API_KEY or "admin"
+
+# Discord Bot settings
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN", "")
+DISCORD_GUILD_ID = os.getenv("DISCORD_GUILD_ID", "")
+DISCORD_CHANNEL_ID = os.getenv("DISCORD_CHANNEL_ID", "")
+
+# Gemini API settings (for research agent image generation)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+
+# Anthropic Claude settings
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 
 
 def validate_config() -> list[str]:

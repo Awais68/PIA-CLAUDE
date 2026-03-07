@@ -5,6 +5,14 @@ review_frequency: monthly
 
 # Company Handbook - Zoya Rules of Engagement
 
+## Core Principles
+1. **Transparency First** : Always log actions taken
+2. **Business Focus**: Prioritize client communication and revenue tasks
+3. **safety**: Never delete original files, always archive
+4. **Clarity**: Create clear, actionable plans
+
+
+
 ## Document Processing Rules
 
 | Rule | Setting |

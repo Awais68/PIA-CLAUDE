@@ -60,6 +60,14 @@ version: 0.1.0
 |------|------|------|----------|
 | <timestamp> | <original_name> | <type> | <priority> |
 
+## Active Todos
+
+| Task | Due | Status |
+|------|-----|--------|
+| <task name> | <due date> | <pending/done> |
+
+*Top 5 pending todos from `todo.md`. See `/todo` for full list.*
+
 ## Alerts
 
 <List any quarantined files with reasons, or "No alerts." if empty>
@@ -70,4 +78,6 @@ version: 0.1.0
 - Only overwrite `Dashboard.md` — do not touch any other files.
 - If a folder is empty, show count as 0.
 - Cap "Recent Activity" to the 10 most recent items.
+- Cap "Active Todos" to the 5 most recent pending items.
+- Pull todo data from `AI_Employee_Vault/todo.md` (read-only).
 - Set `last_updated` in frontmatter to the current UTC time.

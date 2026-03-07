@@ -15,6 +15,13 @@ dependencies = [
     "flask>=3.0.0",
     "tweepy>=4.14.0",
     "playwright>=1.58.0",
+    "schedule>=1.2.2",
+    "scikit-learn>=1.4.0",
+    "numpy>=1.26.0",
+    "discord.py>=2.3.0",
+    "google-generativeai>=0.8.0",
+    "anthropic>=0.21.0",
+    "imapclient>=2.8.0",
 ]
 
 [project.scripts]
@@ -35,6 +42,10 @@ zoya-bank = "src.watchers.bank_watcher:main"
 zoya-smart-reply = "src.automations.smart_reply:main"
 zoya-log-janitor = "src.log_janitor:main"
 zoya-social-daemon = "src.social_media_daemon:main"
+zoya-todo = "src.todo_manager:main"
+zoya-email-draft = "src.automations.email_drafter:main"
+zoya-research = "src.research_agent:main"
+zoya-discord = "src.watchers.discord_watcher:main"
 
 [build-system]
 requires = ["hatchling"]

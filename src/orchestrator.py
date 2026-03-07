@@ -420,10 +420,43 @@ def _process_with_claude(meta_path: Path, companion: Path | None) -> bool:
 
 
 def process_file(meta_path: Path, companion: Path | None) -> bool:
-    """Process a file using the configured AI provider.
+    """Process a file using automation processors or configured AI provider.
 
     Returns True on success, False on failure.
     """
+    # Check if this is an automation task
+    fm = _read_frontmatter(meta_path)
+    file_type = fm.get("type", "").lower()
+
+    # Route automation tasks first
+    if file_type == "linkedin_automation":
+        try:
+            from src.cloud_agent.processors.linkedin_automation_processor import process_linkedin_task
+            logger.info(f"Processing LinkedIn automation task: {meta_path.name}")
+            return process_linkedin_task(meta_path)
+        except Exception as e:
+            logger.error(f"LinkedIn automation error: {e}", exc_info=True)
+            return False
+
+    if file_type == "whatsapp_automation":
+        try:
+            from src.cloud_agent.processors.whatsapp_automation_processor import process_whatsapp_task
+            logger.info(f"Processing WhatsApp automation task: {meta_path.name}")
+            return process_whatsapp_task(meta_path)
+        except Exception as e:
+            logger.error(f"WhatsApp automation error: {e}", exc_info=True)
+            return False
+
+    if file_type == "gmail_automation":
+        try:
+            from src.cloud_agent.processors.gmail_automation_processor import process_gmail_task
+            logger.info(f"Processing Gmail automation task: {meta_path.name}")
+            return process_gmail_task(meta_path)
+        except Exception as e:
+            logger.error(f"Gmail automation error: {e}", exc_info=True)
+            return False
+
+    # Original AI provider routing (for non-automation tasks)
     if AI_PROVIDER == "ollama":
         return _process_with_ollama(meta_path, companion)
     if AI_PROVIDER == "qwen":

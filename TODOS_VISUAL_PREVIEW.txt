@@ -1,0 +1,182 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                          TODOS TAB - VISUAL LAYOUT                           ║
+║                      With Search & Filter Features                           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                                                                              │
+│                          📊 STATISTICS CARDS                                 │
+│  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────────┐ │
+│  │ TOTAL TASKS    │ 12 │  │ COMPLETED  │  4    │  │ PENDING    │  8    │ │
+│  └─────────────────────┘  └─────────────────────┘  └─────────────────────┘ │
+│                                                                              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│                     ✨ ADD NEW TASK SECTION                                  │
+│  ┌────────────────────────────────────────────┐  ┌──────┐  ┌────────────┐  │
+│  │ What needs to be done?                  │  │ Low  │  │ + Add    │  │
+│  └────────────────────────────────────────────┘  └──────┘  └────────────┘  │
+│                                                                              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│                    🔍 SEARCH & FILTERS SECTION                              │
+│  ┌────────────────────────────────────────────────────────────────────────┐  │
+│  │ 🔍 [Search tasks by title...]                                        │  │
+│  ├────────────────────────────────────────────────────────────────────────┤  │
+│  │ Status:                                                                │  │
+│  │ [📋 All] [⏳ Pending] [✅ Completed]                                   │  │
+│  ├────────────────────────────────────────────────────────────────────────┤  │
+│  │ Priority:                                                              │  │
+│  │ [🎯 All] [🔴 High] [🟡 Medium] [🟢 Low]                              │  │
+│  ├────────────────────────────────────────────────────────────────────────┤  │
+│  │ Showing 8 of 12 tasks                                                  │  │
+│  └────────────────────────────────────────────────────────────────────────┘  │
+│                                                                              │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│                         📋 TASK LIST (Newest First)                         │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ ⭕ Update API documentation            [🟡 Medium] 2024-03-09       │   │
+│  │    Edit  Delete                                                       │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ ⭕ Verify WhatsApp integrations       [🟢 Low] 2024-03-08           │   │
+│  │    Edit  Delete                                                       │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ ⭕ Schedule weekly social media posts  [🟡 Medium] 2024-03-07       │   │
+│  │    Edit  Delete                                                       │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ ⭕ Review pending email approvals     [🔴 High] 2024-03-06          │   │
+│  │    Edit  Delete                                                       │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ ⭕ Generate marketing content         [🔴 High] 2024-03-06          │   │
+│  │    Edit  Delete                                                       │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ ⭕ Process new customer leads         [🔴 High] 2024-03-06          │   │
+│  │    Edit  Delete                                                       │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ ⭕ Backup important documents        [🔴 High] 2024-03-06           │   │
+│  │    Edit  Delete                                                       │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  ┌──────────────────────────────────────────────────────────────────────┐   │
+│  │ ⭕ Review cloud system status        [🟡 Medium] 2024-03-06         │   │
+│  │    Edit  Delete                                                       │   │
+│  └──────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+SEARCH & FILTER EXAMPLES:
+
+1️⃣  Search "linkedin"
+    ↓
+    Results:
+    • Update LinkedIn profile banner (Completed)
+    • Review pending email approvals (?)
+    Count: Showing 1 of 12 tasks
+
+2️⃣  Filter Status: Pending + Priority: High
+    ↓
+    Results:
+    • Review pending email approvals
+    • Generate marketing content
+    • Process new customer leads
+    • Backup important documents
+    Count: Showing 4 of 12 tasks
+
+3️⃣  Search "update" + Status: Completed
+    ↓
+    Results:
+    • Update LinkedIn profile banner
+    • Update company handbook
+    Count: Showing 2 of 12 tasks
+
+4️⃣  Priority: Medium + Status: Pending
+    ↓
+    Results:
+    • Schedule weekly social media posts
+    • Review cloud system status
+    • Update API documentation
+    Count: Showing 3 of 12 tasks
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+KEY FEATURES:
+
+✨ Newer Tasks First
+   └─ New tasks appear at top of list automatically
+
+🔍 Real-Time Search
+   └─ Type in search box, tasks filter instantly
+   └─ Case-insensitive, searches title only
+
+📋 Status Filter
+   └─ All Tasks (default)
+   └─ Pending (incomplete)
+   └─ Completed (finished)
+
+🎯 Priority Filter
+   └─ All Priorities (default)
+   └─ High Priority (red)
+   └─ Medium Priority (yellow)
+   └─ Low Priority (green)
+
+🔄 Combined Filters
+   └─ All filters work together
+   └─ Results update in real-time
+   └─ Counter shows: "Showing X of Y tasks"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+COLOR SCHEME:
+
+Filter Buttons:
+  Active:   Bright Green (#00FF88) or Color-coded for priority
+  Inactive: Gray background with light blue text
+
+Priority Badges:
+  🔴 High:   Red (#FF4444)
+  🟡 Medium: Yellow (#FFB800)
+  🟢 Low:    Green (#00FF88)
+
+Task Completion:
+  ⭕ Uncompleted: Empty circle
+  ✅ Completed:   Filled checkmark circle
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+RESPONSIVE BEHAVIOR:
+
+Desktop (1280px+):
+  ├─ Full-width search box
+  ├─ Filters on one line
+  └─ Task list with full spacing
+
+Tablet (768px):
+  ├─ Wrapped filters
+  ├─ Two columns for buttons
+  └─ Condensed task display
+
+Mobile (640px):
+  ├─ Stacked layout
+  ├─ Full-width buttons
+  └─ Optimized for touch
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+BUILD STATUS: ✅ SUCCESS
+PRODUCTION READY: ✅ YES

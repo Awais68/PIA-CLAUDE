@@ -1,33 +1,35 @@
 ---
-last_updated: 2026-03-01T10:09:02.418274+00:00
+last_updated: 2026-03-06T15:12:30.504802+00:00
 ai_provider: qwen/qwen-plus
 ---
 
 # Zoya Dashboard
 
-**Last updated:** 2026-03-01 10:09:02 UTC
+**Last updated:** 2026-03-06 15:12:30 UTC
 **AI Provider:** Qwen (qwen-plus)
-**System Health:** 100/100 (OK)
+**System Health:** 90/100 (WARNING)
 
 ## Queue Status
 
 | Folder | Count |
 |--------|-------|
-| Inbox | 4 |
-| Needs Action | 4 |
+| Inbox | 8 |
+| Needs Action | 85 |
 | In Progress | 0 |
-| Done | 69 |
-| Quarantine | 0 |
-| Pending Approval | 1 |
+| Done | 110 |
+| Quarantine | 1 |
+| Pending Approval | 7 |
 | Plans | 0 |
 | Briefings | 4 |
 | Contacts | 3 |
+
+> **Alerts:** 1 item(s) in Quarantine need review.
 
 ## Watcher Stats
 
 | Source | Processed |
 |--------|----------|
-| File Drop | 65 |
+| File Drop | 106 |
 | Gmail | 1 |
 | WhatsApp | 0 |
 
@@ -35,13 +37,13 @@ ai_provider: qwen/qwen-plus
 
 | File | Type | Source | Priority | Processed |
 |------|------|--------|----------|-----------|
-| 7.1.2-Bills-of-Solar-Panels-Installation.pdf | file_drop | file_drop | ? | 2026-03-01T10:09:02 |
-| sample_invoice.md | other | file_drop | low | 2026-03-01T09:53:58 |
-| EMAIL_20260224_152040___Code__add_kashmala_Deen.md | file_drop | file_drop | medium | 2026-02-24T15:23:13 |
-| EMAIL_20260224_152039_ATTENTION___DIGISKILLS_3_0_BATCH-03_ENROLLMENTS_ARE_NOW_OPEN.md | other | file_drop | low | 2026-02-24T15:22:40 |
-| EMAIL_20260224_152038_Google_for_Developers_shared_a_post__Create_next-gen_smart_h.md | file_drop | file_drop | ? | 2026-02-24T15:21:31 |
-| EMAIL_20260223_143043_Code__Google_for_Developers_has_a_new_post_for_you.md | other | file_drop | low | 2026-02-23T14:32:50 |
-| test_connectivity.md | other | file_drop | low | 2026-02-23T13:36:31 |
-| EMAIL_20260220_213224_Code__add_Maira_Hassan_-_Assistant_GIS_Analyst___.md | note | file_drop | low | 2026-02-23T13:35:55 |
-| EMAIL_20260220_213123_You_have_1_new_invitation.md | other | file_drop | low | 2026-02-23T13:34:48 |
-| EMAIL_20260220_213658_Your_account_is_live___next__add_your_business_info.md | note | file_drop | medium | 2026-02-23T13:34:29 |
+| EMAIL_20260306_150436_Here_s_exactly_how_I_hit_6_figures_with_AI.md | note | file_drop | low | 2026-03-06T15:12:30 |
+| EMAIL_20260306_150328_How_I_get_10-30_qualified_conversations_every_month__exact_b.md | other | file_drop | low | 2026-03-06T15:12:01 |
+| EMAIL_20260306_150435_Continue_your_AI_learning_in_person_with_Andrew_Ng.md | other | file_drop | low | 2026-03-06T15:11:04 |
+| EMAIL_20260306_150334_BIG_BREAKING_NEWS___UAE_halts_visas_for_most_Pakistanis__Pak.md | other | file_drop | low | 2026-03-06T15:10:33 |
+| EMAIL_20260306_150334_Trainees_Earning_Survey__DSTP3_0-Batch-01_.md | note | file_drop | low | 2026-03-06T15:09:54 |
+| EMAIL_20260306_150333_Why_I_actually_built_this__most_people_in_this_space_won_t_l.md | other | file_drop | low | 2026-03-06T15:09:27 |
+| EMAIL_20260306_150227_Gross_Salary_Rs__90457_after_Deduction_it_is_around_Rs_77000.md | receipt | file_drop | high | 2026-03-06T15:08:59 |
+| EMAIL_20260306_150332_UBL_Digital_App___Voice_Enabled_Banking_-_First_in_Pakistan_.md | other | file_drop | low | 2026-03-06T15:08:29 |
+| EMAIL_20260306_150226_What_the_first_30_days_inside_AIA_actually_look_like.md | other | file_drop | low | 2026-03-06T15:07:48 |
+| EMAIL_20260306_150225_Get_DigiSkills_pk_E-Certificate_by_Attempting_JUST_2_Pending.md | other | file_drop | low | 2026-03-06T15:07:18 |

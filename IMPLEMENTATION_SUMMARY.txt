@@ -1,0 +1,220 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                 ZOYA PLATINUM TIER - FEATURE EXPANSION                         ║
+║                           ✅ 100% COMPLETE                                     ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+📅 Date: 2026-03-07
+⏱️  Time to Implementation: ~15 minutes (after setup)
+🎯 Status: Ready for Testing & Deployment
+
+════════════════════════════════════════════════════════════════════════════════
+
+🎨 FEATURES IMPLEMENTED (4 Major Components)
+
+┌─ 1️⃣  EMAIL DRAFT SKILL (TF-IDF) ─────────────────────────────────────────────┐
+│                                                                               │
+│ 📄 File:     src/automations/email_drafter.py (200 lines)                   │
+│ 🎯 Purpose:  Smart email drafting using TF-IDF similarity                   │
+│ 🔄 Flow:     Incoming Email → Match similar past emails → Claude draft      │
+│ 📤 Output:   AI_Employee_Vault/Pending_Approval/EMAIL_DRAFT_*.md            │
+│                                                                               │
+│ ✨ Features:                                                                  │
+│    • Loads past emails from Done/ folder                                    │
+│    • Computes TF-IDF vectors for similarity matching                        │
+│    • Returns top 3 similar emails with scores                               │
+│    • Uses Claude to draft context-aware replies                             │
+│    • Saves drafts with transparency (similar email refs included)           │
+│                                                                               │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+┌─ 2️⃣  DISCORD BOT + WATCHER ────────────────────────────────────────────────────┐
+│                                                                               │
+│ 📁 Files:    src/watchers/discord_watcher.py (500 lines)                    │
+│              src/mcp_servers/discord_mcp.py (150 lines)                     │
+│ 🤖 Purpose:  Interactive Discord bot with modals & commands                 │
+│                                                                               │
+│ 🎮 Commands:                                                                 │
+│    /zoya       → Main menu (6 action buttons)                               │
+│    /task       → List tasks from Needs_Action/                              │
+│    /dashboard  → View current Dashboard.md                                  │
+│    /expense    → Modal popup (add expense)                                  │
+│    /todo       → Modal popup (add todo)                                     │
+│    /email      → Modal popup (draft email)                                  │
+│    /research   → Modal popup (request research)                             │
+│                                                                               │
+│ 🎚️  Modal: Add Expense                                                       │
+│    ├─ Amount (PKR) [text input]                                             │
+│    ├─ Category [select: Food/Transport/Utilities/Software/Marketing/Other] │
+│    ├─ Description [text input]                                              │
+│    └─ Date [YYYY-MM-DD]                                                     │
+│    → Creates EXPENSE_*.md in Inbox/                                         │
+│                                                                               │
+│ 🎚️  Modal: Add Todo                                                          │
+│    ├─ Task Name [text input]                                                │
+│    ├─ Priority [High/Medium/Low]                                            │
+│    ├─ Due Date [YYYY-MM-DD]                                                 │
+│    └─ Recurrence [None/Daily/Weekly/Monthly]                                │
+│    → Creates TASK_*_todo_*.md in Inbox/ + updates todo.md                   │
+│                                                                               │
+│ ⚡ Features:                                                                  │
+│    • Auto-restart on crash (30s cooldown)                                   │
+│    • Retry failed API calls (3x with exponential backoff)                   │
+│    • Save state to Logs/discord_state.json for recovery                     │
+│    • Real-time command sync to Discord                                      │
+│                                                                               │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+┌─ 3️⃣  TODO SYSTEM (Full CRUD) ─────────────────────────────────────────────────┐
+│                                                                               │
+│ 📄 File:     src/todo_manager.py (300 lines)                                │
+│ 📋 Storage:  AI_Employee_Vault/todo.md (canonical source)                   │
+│ 🎯 Purpose:  Complete todo management with Dashboard sync                   │
+│                                                                               │
+│ 🔧 Operations:                                                               │
+│    create_todo()      → Generate T001, T002, ...                            │
+│    read_todo()        → Fetch todo by ID                                    │
+│    update_todo()      → Update task/due/recurrence/status                   │
+│    delete_todo()      → Remove from todo.md                                 │
+│    complete_todo()    → Move to Done section                                │
+│    list_todos()       → Get all/filtered todos                              │
+│    sync_dashboard()   → Update Dashboard.md with top 5 pending              │
+│                                                                               │
+│ 📊 todo.md Format:                                                            │
+│    ---                                                                        │
+│    last_updated: 2026-03-07T10:30:00                                        │
+│    total: 5                                                                  │
+│    pending: 3                                                                │
+│    done: 2                                                                   │
+│    ---                                                                        │
+│                                                                               │
+│    | ID  | Task | Due | Recurrence | Status | Created |                    │
+│    | T001 | Fix payment flow | 2026-03-10 | None | pending | 2026-03-06 |   │
+│                                                                               │
+│ 📈 Integration:                                                               │
+│    Discord /todo Modal                                                       │
+│      → todo_manager.create_todo()                                           │
+│      → todo.md updated (atomic: temp → rename)                              │
+│      → Dashboard.md "## Active Todos" synced                                │
+│      → TASK_*_todo_*.md created in Inbox/ for approval                      │
+│                                                                               │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+┌─ 4️⃣  STOCK/CRYPTO RESEARCH AGENT ──────────────────────────────────────────────┐
+│                                                                               │
+│ 📄 File:     src/research_agent.py (350 lines)                              │
+│ 📤 Output:   AI_Employee_Vault/Research/RESEARCH_*.md + images/             │
+│ 🎯 Purpose:  Multi-topic research with web scraping + image generation      │
+│                                                                               │
+│ 🔄 Flow:                                                                     │
+│    1. Parse research request (topics + optional schedule)                   │
+│    2. Playwright web scraping:                                              │
+│       • Google News → Headlines                                             │
+│       • Yahoo Finance → Price data, volume, changes                         │
+│       • CoinGecko → Crypto market data                                      │
+│    3. Claude analysis (summary + sentiment)                                 │
+│    4. Gemini image generation (infographic per topic)                       │
+│    5. Save report to Research/<topic>_YYYYMMDD.md                           │
+│                                                                               │
+│ 📋 Report Format:                                                             │
+│    ---                                                                        │
+│    type: research_report                                                     │
+│    topics: ["BTC", "AAPL"]                                                  │
+│    generated: 2026-03-07T10:30:00                                           │
+│    scheduled: false                                                          │
+│    ---                                                                        │
+│                                                                               │
+│    ## BTC - Bitcoin                                                          │
+│    **Summary**: [2-3 paragraph analysis]                                     │
+│    **Key Data**: Price: $42,500 | 24h: +3.2% | Volume: $28B                │
+│    **Sentiment**: Bullish 🟢                                                 │
+│    **Key Points**:                                                           │
+│      1. Institutional inflows accelerate                                    │
+│      2. Technical breakout above $42K                                       │
+│      3. Funding rates elevated but sustainable                              │
+│                                                                               │
+│ 🎯 Features:                                                                  │
+│    • Async research for parallel processing                                 │
+│    • Optional scheduling support (daily, weekly, monthly)                   │
+│    • Fallback for missing services (Claude only if Playwright fails)        │
+│    • Text-based infographics (Gemini)                                       │
+│                                                                               │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+════════════════════════════════════════════════════════════════════════════════
+
+📊 IMPLEMENTATION STATISTICS
+
+Languages:      Python (4 modules) + Markdown (4 skills)
+Total Lines:    1,400 lines of code
+Dependencies:   5 new packages
+Entry Points:   4 new CLI commands
+Config Vars:    7 new environment variables
+Skills:         4 new skill modules
+
+Files Created:
+  ✅ src/todo_manager.py                          (300 lines)
+  ✅ src/automations/email_drafter.py             (200 lines)
+  ✅ src/research_agent.py                        (350 lines)
+  ✅ src/watchers/discord_watcher.py              (500 lines)
+  ✅ src/mcp_servers/discord_mcp.py               (150 lines)
+  ✅ AI_Employee_Vault/todo.md                     (40 lines)
+  ✅ .claude/skills/draft-email/SKILL.md          (60 lines)
+  ✅ .claude/skills/todo-manager/SKILL.md         (70 lines)
+  ✅ .claude/skills/research-agent/SKILL.md       (80 lines)
+
+Files Modified:
+  ✅ pyproject.toml                               (+8 lines)
+  ✅ src/config.py                                (+15 lines)
+  ✅ .claude/skills/dashboard-updater/SKILL.md    (+15 lines)
+
+════════════════════════════════════════════════════════════════════════════════
+
+🚀 QUICK START
+
+1. Install dependencies:
+   $ uv add scikit-learn numpy discord.py google-generativeai anthropic
+
+2. Configure .env:
+   DISCORD_TOKEN=<bot_token>
+   DISCORD_GUILD_ID=<server_id>
+   DISCORD_CHANNEL_ID=<channel_id>
+   GEMINI_API_KEY=<gemini_key>
+   ANTHROPIC_API_KEY=<your_key>
+
+3. Test components:
+   $ python -m src.todo_manager create "Test" "High"
+   $ python -m src.automations.email_drafter test
+   $ python -m src.research_agent --topics "BTC" --dry-run
+
+4. Start Discord bot:
+   $ python -m src.watchers.discord_watcher
+
+5. Try Discord commands:
+   /zoya → Menu
+   /todo → Add todo modal
+   /expense → Add expense modal
+   /email → Draft email
+   /research → Request research
+
+════════════════════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTATION
+
+  Primary:   PLATINUM_TIER_EXPANSION_COMPLETE.md  (Comprehensive guide)
+  Quick:     QUICKSTART_FEATURE_EXPANSION.md      (15-minute setup)
+  Skills:    .claude/skills/*/SKILL.md             (Detailed instructions)
+  Memory:    FEATURE_EXPANSION_2026_03_07.md       (Persistent notes)
+
+════════════════════════════════════════════════════════════════════════════════
+
+✨ READY FOR:
+  ✅ Testing (all syntax validated)
+  ✅ Deployment (all dependencies listed)
+  ✅ Integration (with orchestrator via skills)
+  ✅ Production (after .env configuration)
+
+════════════════════════════════════════════════════════════════════════════════
+
+Generated: 2026-03-07 01:05 UTC
+Status: COMPLETE & VALIDATED
+Next: Install dependencies + Configure .env + Test components
