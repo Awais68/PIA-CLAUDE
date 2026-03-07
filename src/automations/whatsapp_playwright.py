@@ -1,7 +1,7 @@
 """
 WhatsApp Automation using Playwright
 Handles: Send Message, Read Messages, Forward, React, Status
-Uses persistent context (NOT cookies) for WhatsApp Web session persistence
+Uses persistent storage state for permanent session persistence (one-time QR scan only)
 """
 
 import asyncio
@@ -17,6 +17,9 @@ from src.playwright_utils import get_session_path, validate_session, screenshot_
 
 logger = logging.getLogger(__name__)
 
+# Session state file for permanent persistence
+STATE_FILE = Path(os.getcwd()) / "whatsapp_session.json"
+
 class WhatsAppPlaywright:
     def __init__(self, headless: bool = False):
         self.headless = headless
@@ -27,13 +30,11 @@ class WhatsAppPlaywright:
         self.session_dir = get_session_path("whatsapp").parent
 
     async def login(self) -> bool:
-        """Login to WhatsApp Web using persistent browser context"""
+        """Login to WhatsApp Web with permanent session persistence (one-time QR scan)"""
         try:
             self.playwright = await async_playwright().start()
 
-            # Use persistent context (proper way to save WhatsApp Web sessions)
-            # This persists all session data: localStorage, sessionStorage, cookies, etc.
-            logger.info("ℹ️ Launching browser with persistent context...")
+            logger.info("ℹ️ Launching browser...")
             self.browser = await self.playwright.chromium.launch(
                 headless=self.headless,
                 args=[
@@ -42,11 +43,28 @@ class WhatsAppPlaywright:
                 ]
             )
 
-            # Create persistent context (reuses stored session if available)
+            # Try to load saved session state first (one-time QR scan only)
+            storage_state = None
+            session_exists = STATE_FILE.exists()
+
+            if session_exists:
+                try:
+                    with open(STATE_FILE, 'r') as f:
+                        storage_state = json.load(f)
+                    logger.info("✅ Loaded saved session - no QR needed!")
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not load session: {e}")
+                    session_exists = False
+
+            # Create context with saved state if available
             self.context = await self.browser.new_context(
-                viewport={"width": 1280, "height": 720}
+                viewport={"width": 1280, "height": 720},
+                storage_state=storage_state
             )
             self.page = await self.context.new_page()
+
+            if not session_exists:
+                logger.info("🆕 New session - QR code scan required (one time only)")
 
             logger.info("ℹ️ Navigating to WhatsApp Web...")
             try:
@@ -102,15 +120,8 @@ class WhatsAppPlaywright:
             # Wait a bit more for UI to fully render
             await asyncio.sleep(2)
 
-            # Save persistent context state
-            try:
-                self.session_dir.mkdir(exist_ok=True)
-                state = await self.context.storage_state()
-                with open(self.session_dir / "state.json", 'w') as f:
-                    json.dump(state, f)
-                logger.info(f"💾 WhatsApp session saved to {self.session_dir}")
-            except Exception as e:
-                logger.warning(f"⚠️ Could not save session: {e}")
+            # Save session state
+            await self._save_session()
 
             logger.info("✅ WhatsApp login successful")
             return True
@@ -138,6 +149,9 @@ class WhatsAppPlaywright:
             search_input = None
             search_selectors = [
                 "[data-testid='search-input']",
+                "div[contenteditable='true'][aria-placeholder*='Search']",
+                "div[contenteditable='true'][role='textbox']",
+                "div.lexical-rich-text-input",
                 "input[placeholder*='Search']",
                 "input[placeholder*='search']",
                 "input[aria-label*='Search']"
@@ -171,42 +185,62 @@ class WhatsAppPlaywright:
                 await screenshot_on_error(self.page, "whatsapp_search_failed")
                 return False
 
-            # Step 3: Find and click contact from search results
-            logger.info(f"ℹ️ Looking for contact in results...")
-            result_selectors = [
-                "[data-testid='cell-frame-container']",
-                "[role='option']",
-                "[role='listitem']"
+            # Step 3: Find and click the chat row for this contact
+            logger.info(f"ℹ️ Looking for chat with '{contact_name}'...")
+
+            # Better chat row selectors (2025-2026 WhatsApp Web structure)
+            chat_selectors = [
+                "div[role='listitem']",                      # basic chat row
+                f"span[title='{contact_name}']",             # exact name match
+                "div._ak8o._ak8p._ak8q._ak8r",              # class-based selector
+                f"div[title*='{contact_name}']",            # title attribute match
+                "div[aria-label*='Open chat']"              # aria fallback
             ]
 
             contact_clicked = False
-            for selector in result_selectors:
+            for selector in chat_selectors:
                 try:
-                    chat_items = await self.page.query_selector_all(selector)
-                    if chat_items:
-                        logger.info(f"   Found {len(chat_items)} results")
-                        await chat_items[0].click()
-                        logger.info("✅ Clicked contact from search results")
+                    chat_elem = self.page.locator(selector).first
+                    is_visible = await chat_elem.is_visible(timeout=2000)
+                    if is_visible:
+                        logger.info(f"✅ Found chat with selector: {selector}")
+                        await chat_elem.click()
                         contact_clicked = True
+                        logger.info(f"✅ Clicked chat for '{contact_name}'")
                         await asyncio.sleep(2)
                         break
                 except Exception as e:
-                    logger.debug(f"Result selector '{selector}' failed: {e}")
+                    logger.debug(f"Selector '{selector}' failed: {e}")
                     continue
 
             if not contact_clicked:
-                logger.warning("⚠️ Could not click contact from results")
+                logger.warning("⚠️ Could not find/click contact chat")
                 await screenshot_on_error(self.page, "whatsapp_contact_not_found")
                 return False
 
-            # Step 4: Find message input
+            # Step 3b: Wait for chat window and message input to fully load
+            try:
+                # Wait for message input with data-tab='10'
+                await self.page.wait_for_selector(
+                    "div[contenteditable='true'][data-tab='10']",
+                    timeout=5000
+                )
+                logger.info("✅ Chat window opened successfully")
+                await asyncio.sleep(1)
+            except Exception as e:
+                logger.debug(f"Chat loading may be slow: {e}")
+                await asyncio.sleep(2)
+
+            # Step 4: Find message input using data-tab='10' (main message box)
             logger.info("ℹ️ Looking for message input...")
             msg_input = None
+
+            # Primary selector: data-tab='10' for message input
             msg_selectors = [
-                "[data-testid='conversation-compose-box-input']",
-                "[contenteditable='true'][role='textbox']",
-                "[contenteditable='true']",
-                "div[aria-label*='message']"
+                "div[contenteditable='true'][data-tab='10']",     # main message box
+                "div[title='Type a message']",
+                "div[role='textbox'][contenteditable='true']",
+                "[data-testid='conversation-compose-box-input']"
             ]
 
             for selector in msg_selectors:
@@ -225,57 +259,43 @@ class WhatsAppPlaywright:
                 await screenshot_on_error(self.page, "whatsapp_message_input_not_found")
                 return False
 
-            # Step 5: Fill and send message
+            # Step 5: Type message and send
             try:
                 await msg_input.click()
                 await asyncio.sleep(0.5)
-                await msg_input.fill(message)
-                logger.info(f"ℹ️ Typing message ({len(message)} characters)...")
+
+                # Type message character by character for reliability
+                await msg_input.type(message, delay=5)
+                logger.info(f"✅ Typed message ({len(message)} characters)")
                 await asyncio.sleep(1)
             except Exception as e:
-                logger.error(f"❌ Failed to fill message: {e}")
+                logger.error(f"❌ Failed to type message: {e}")
                 await screenshot_on_error(self.page, "whatsapp_fill_message_failed")
                 return False
 
-            # Step 6: Find and click send button
-            logger.info("ℹ️ Looking for send button...")
-            send_btn = None
-            send_selectors = [
-                "[data-testid='send']",
-                "button[aria-label='Send']",
-                "button[title='Send']",
-                "svg[aria-label='Send']"
-            ]
-
-            for selector in send_selectors:
+            # Step 6: Send message via Enter key
+            try:
+                logger.info("ℹ️ Sending message...")
+                await msg_input.press("Enter")
+                logger.info("✅ Message sent!")
+                await asyncio.sleep(2)
+            except Exception as e:
+                logger.error(f"❌ Failed to send message: {e}")
+                # Try finding and clicking send button as fallback
                 try:
-                    elem = await self.page.query_selector(selector)
-                    if elem:
-                        logger.info(f"✅ Found send button: {selector}")
-                        send_btn = elem
-                        break
-                except Exception as e:
-                    logger.debug(f"Send button selector '{selector}' failed: {e}")
-                    continue
-
-            if send_btn:
-                try:
-                    await send_btn.click()
-                    logger.info("✅ Clicked send button")
-                except Exception as e:
-                    logger.warning(f"⚠️ Failed to click send button, trying Enter key: {e}")
-                    await msg_input.press("Enter")
-            else:
-                logger.warning("⚠️ Send button not found, using Enter key...")
-                try:
-                    await msg_input.press("Enter")
-                except Exception as e:
-                    logger.error(f"❌ Failed to send with Enter key: {e}")
+                    send_btn = await self.page.query_selector("button[aria-label='Send']")
+                    if send_btn:
+                        await send_btn.click()
+                        await asyncio.sleep(2)
+                        logger.info("✅ Message sent via button!")
+                    else:
+                        raise Exception("No send button found")
+                except Exception as e2:
+                    logger.error(f"❌ Send button also failed: {e2}")
                     await screenshot_on_error(self.page, "whatsapp_send_failed")
                     return False
 
-            await asyncio.sleep(2)
-            logger.info(f"✅ Sent message to {contact_name}")
+            logger.info(f"✅ Successfully sent message to {contact_name}")
             return True
 
         except Exception as e:
@@ -292,7 +312,11 @@ class WhatsAppPlaywright:
                 return []
 
             # Search for contact
-            search_box = await self.page.query_selector("[data-testid='search-input']")
+            search_box = None
+            try:
+                search_box = await self.page.query_selector("div[contenteditable='true'][role='textbox']")
+            except:
+                search_box = await self.page.query_selector("[data-testid='search-input']")
             if search_box:
                 try:
                     await search_box.fill(contact_name)
@@ -343,7 +367,10 @@ class WhatsAppPlaywright:
                 return False
 
             # Search for contact
-            search_box = await self.page.query_selector("input[placeholder='Search or start new chat']")
+            search_box = await self.page.query_selector("div[contenteditable='true'][role='textbox']")
+            if not search_box:
+                search_box = await self.page.query_selector("input[placeholder='Search or start new chat']")
+
             if search_box:
                 await search_box.fill(contact_name)
                 await asyncio.sleep(1)
@@ -422,7 +449,10 @@ class WhatsAppPlaywright:
                 return None
 
             # Search for contact
-            search_box = await self.page.query_selector("input[placeholder='Search or start new chat']")
+            search_box = await self.page.query_selector("div[contenteditable='true'][role='textbox']")
+            if not search_box:
+                search_box = await self.page.query_selector("input[placeholder='Search or start new chat']")
+
             if search_box:
                 await search_box.fill(contact_name)
                 await asyncio.sleep(1)
@@ -447,9 +477,24 @@ class WhatsAppPlaywright:
             logger.error(f"❌ Failed to get status: {e}")
             return None
 
+    async def _save_session(self):
+        """Save current session state for permanent reuse (one-time QR scan persistence)"""
+        try:
+            state = await self.context.storage_state()
+            with open(STATE_FILE, 'w') as f:
+                json.dump(state, f)
+            logger.info(f"💾 Session saved permanently: {STATE_FILE}")
+            logger.info("✅ Next run will use saved session (no QR needed)")
+        except Exception as e:
+            logger.warning(f"⚠️ Could not save session: {e}")
+
     async def close(self):
         """Close browser and context"""
         try:
+            # Save session state before closing
+            if self.context:
+                await self._save_session()
+
             if self.context:
                 await self.context.close()
                 logger.info("WhatsApp context closed")
@@ -466,7 +511,7 @@ class WhatsAppPlaywright:
         await self.login()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, *_args) -> None:  # noqa
         await self.close()
 
 

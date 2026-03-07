@@ -149,40 +149,58 @@ class LinkedInPlaywright:
                 logger.error(f"❌ Failed to navigate to feed: {e}")
                 return False
 
-            # Try multiple selectors for "Start a post" button (ordered by stability)
-            post_button_selectors = [
-                "[data-test-id='start-post-button']",
-                "[aria-label='Start a post']",
-                "[aria-label='Post to your network']",
-                ".share-creation-button",
-                "button[data-test-id='new-post-button']"
-            ]
+            # Use locator with text matching for "Start a post" (more reliable for React)
+            logger.info("ℹ️ Looking for 'Start a post' element...")
 
             post_button = None
-            for selector in post_button_selectors:
-                try:
-                    post_button = await self.page.query_selector(selector)
-                    if post_button:
-                        logger.info(f"✅ Found post button with selector: {selector}")
-                        break
-                except Exception as e:
-                    logger.debug(f"Selector '{selector}' failed: {e}")
-                    continue
+            try:
+                # Try locator with text matching first (works with dynamic React content)
+                post_button = self.page.locator("text='Start a post'").first
+                await post_button.wait_for(timeout=5000)
+                logger.info("✅ Found 'Start a post' via text locator")
+            except Exception as e:
+                logger.debug(f"Text locator failed: {e}")
+
+                # Fallback to CSS selectors
+                post_button_selectors = [
+                    "[data-test-id='start-post-button']",
+                    "[aria-label='Start a post']",
+                    "[placeholder='Start a post']",
+                    "input[placeholder='Start a post']",
+                    ".share-creation-input",
+                    "button[aria-label='Post to your network']",
+                    ".share-creation-button"
+                ]
+
+                for selector in post_button_selectors:
+                    try:
+                        el = await self.page.query_selector(selector)
+                        if el:
+                            post_button = el
+                            logger.info(f"✅ Found post input with selector: {selector}")
+                            break
+                    except Exception as e:
+                        logger.debug(f"Selector '{selector}' failed: {e}")
+                        continue
 
             if not post_button:
-                logger.error("❌ Could not find post button")
+                logger.error("❌ Could not find post input field")
                 await screenshot_on_error(self.page, "linkedin_post_button_not_found")
                 return False
 
             # Scroll into view and click
             try:
-                await post_button.scroll_into_view_if_needed()
+                if hasattr(post_button, 'scroll_into_view_if_needed'):
+                    await post_button.scroll_into_view_if_needed()
+                else:
+                    await post_button.scroll_into_view_if_needed()
                 await asyncio.sleep(0.5)
                 await post_button.click()
-                logger.info("ℹ️ Clicked post button, waiting for composer...")
-                await asyncio.sleep(2)
+                logger.info("ℹ️ Clicked post input, waiting for composer to load...")
+                await asyncio.sleep(2.5)  # Wait for composer modal to appear
             except Exception as e:
-                logger.error(f"❌ Failed to click post button: {e}")
+                logger.error(f"❌ Failed to click post input: {e}")
+                await screenshot_on_error(self.page, "linkedin_click_post_button_failed")
                 return False
 
             # Try multiple selectors for the editor (ordered by stability)
@@ -239,6 +257,8 @@ class LinkedInPlaywright:
             # Post - try multiple selectors (ordered by stability)
             post_btn_selectors = [
                 "[data-test-id='post-button']",
+                "button.share-actions__primary-action",
+                "div.share-box_actions button",
                 "button[aria-label='Post']",
                 "[aria-label='Publish post']",
                 "button[data-test-id='share-button']"
@@ -247,11 +267,12 @@ class LinkedInPlaywright:
             posted = False
             for selector in post_btn_selectors:
                 try:
-                    btn = await self.page.query_selector(selector)
+                    # Wait for button to be stable (1.6s for render completion)
+                    btn = await self.page.wait_for_selector(selector, timeout=3000)
                     if btn:
                         # Ensure button is visible and enabled
                         await btn.scroll_into_view_if_needed()
-                        await asyncio.sleep(0.5)
+                        await asyncio.sleep(1.6)  # Wait for button to fully stabilize
 
                         is_disabled = await btn.get_attribute("disabled")
                         if is_disabled:
@@ -375,7 +396,7 @@ class LinkedInPlaywright:
         await self.login()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, *_args) -> None:  # noqa
         await self.close()
 
 

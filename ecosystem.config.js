@@ -111,7 +111,41 @@ module.exports = {
     },
 
     // ============================================================
-    // 4. ORCHESTRATOR
+    // 4. WHATSAPP PERSISTENT SESSION (Node.js whatsapp-web.js)
+    // Production-grade WhatsApp with persistent session & auto-reconnect
+    // Scans QR once, auto-connects forever
+    // ============================================================
+    {
+      name: 'whatsapp-persistent-session',
+      script: 'watchers/whatsapp/whatsapp_watcher.js',
+      cwd: projectDir,
+      instances: 1,
+      exec_mode: 'fork',
+      interpreter: 'node',
+
+      autorestart: true,
+      max_restarts: 999,
+      min_uptime: '10s',
+      max_memory_restart: '300M',
+
+      out_file: path.join(projectDir, 'AI_Employee_Vault/Logs/pm2-whatsapp-web-out.log'),
+      error_file: path.join(projectDir, 'AI_Employee_Vault/Logs/pm2-whatsapp-web-err.log'),
+      log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+
+      env: {
+        NODE_ENV: 'production',
+        VAULT_PATH: path.join(process.env.HOME, 'AI_Employee_Vault'),
+        SESSION_PATH: path.join(projectDir, 'watchers/whatsapp/.wwebjs_auth'),
+      },
+
+      kill_timeout: 10000, // Graceful shutdown time
+      listen_timeout: 5000,
+      merge_logs: false,
+      watch: false,
+    },
+
+    // ============================================================
+    // 5. ORCHESTRATOR
     // Main coordinator: claims files from queue, invokes Claude
     // Includes: Ralph self-monitor + Contact Linker
     // ============================================================
