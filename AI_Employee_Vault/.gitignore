@@ -13,7 +13,7 @@ secrets/
 oauth_session.json
 credentials.json
 token.json
-
+whatsapp_session.json
 
 # Application cache/artifacts (not needed in sync)
 .pytest_cache/

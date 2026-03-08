@@ -84,6 +84,16 @@ tmp/
 .quarantine/
 .backup_*
 
+# Debug & test artifacts
+debug_*.py
+debug_*.png
+test_*.py
+test_*.html
+test_*.log
+playwright_errors/
+*.log
+automation_world_integration_report_*.html
+
 # Vault runtime artifacts (tracked via .gitkeep, not contents)
 AI_Employee_Vault/Needs_Action/*
 AI_Employee_Vault/In_Progress/*
